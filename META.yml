@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: 6.42
   Test::More: 0
+  Test::Requires: 0.02
 configure_requires:
   ExtUtils::MakeMaker: 6.42
 distribution_type: module

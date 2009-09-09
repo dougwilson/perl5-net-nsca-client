@@ -10,7 +10,8 @@ requires 'URI'              => 0;
 requires 'base'             => 0;
 requires 'namespace::clean' => 0;
 
-test_requires 'Test::More' => 0;
+test_requires 'Test::More'     => 0;
+test_requires 'Test::Requires' => '0.02';
 
 # Modules that are required for author tests
 author_requires 'Pod::Coverage'           => '0.18';
