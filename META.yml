@@ -21,9 +21,13 @@ no_index:
     - t
     - xt
 requires:
-  URI: 0
-  base: 0
-  namespace::clean: 0
+  Convert::Binary::C: 0.74
+  Crypt::Random: 0
+  Digest::CRC: 0
+  Moose: 0.89
+  MooseX::StrictConstructor: 0.08
+  Readonly: 1.03
+  namespace::clean: 0.04
   perl: 5.8.1
 resources:
   license: http://dev.perl.org/licenses/

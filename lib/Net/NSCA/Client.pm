@@ -15,11 +15,30 @@ use Moose 0.89;
 use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
+# MODULES
+use Net::NSCA::Client::DataPacket;
+use Net::NSCA::Client::InitialPacket;
+use Readonly 1.03;
+
+###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
 use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
+# CONSTANTS
+Readonly our $STATUS_OK       => 0;
+Readonly our $STATUS_WARNING  => 1;
+Readonly our $STATUS_CRITICAL => 2;
+Readonly our $STATUS_UNKNOWN  => 3;
+
+###############################################################################
 # ATTRIBUTES
+has protocol_version => (
+	is  => 'rw',
+	isa => 'Int',
+
+	default => 3,
+);
 has remote_host => (
 	is  => 'rw',
 	isa => 'Str',
@@ -33,6 +52,12 @@ has remote_port => (
 
 	default => 5667,
 );
+
+###############################################################################
+# METHODS
+
+###############################################################################
+# PRIVATE METHODS
 
 1;
 
@@ -48,12 +73,26 @@ This documnetation refers to L<Net::NSCA::Client> version 0.001
 
 =head1 SYNOPSIS
 
-Currently the main module, L<Net::NSCA::Client> has not been completed and
-there is no documentation.
+  use Net::NSCA::Client;
+
+  my $nsca = Net::NSCA::Client->new(
+    remote_host => 'nagios.example.net',
+  );
+
+  $nsca->send_report(
+    hostname => 'web1.example.net',
+    service  => 'MYSQL',
+    message  => $plugin_output,
+    status   => $Net::NSCA::Client::STATUS_OK,
+  );
 
 =head1 DESCRIPTION
 
 Send passive checks to Nagios locally and remotely.
+
+=head1 CONSTRUCTOR
+
+=head1 ATTRIBUTES
 
 =head1 METHODS
 

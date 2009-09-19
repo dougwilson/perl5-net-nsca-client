@@ -6,14 +6,19 @@ author   'Douglas Christopher Wilson <doug@somethingdoug.com>';
 license  'perl';
 
 # Modules that are required
-requires 'URI'              => 0;
-requires 'base'             => 0;
-requires 'namespace::clean' => 0;
+requires 'Convert::Binary::C'        => '0.74';
+requires 'Crypt::Random'             => 0;
+requires 'Digest::CRC'               => 0;
+requires 'Moose'                     => '0.89';
+requires 'MooseX::StrictConstructor' => '0.08';
+requires 'Readonly'                  => '1.03';
+requires 'namespace::clean'          => '0.04';
 
 test_requires 'Test::More'     => 0;
 test_requires 'Test::Requires' => '0.02';
 
 # Modules that are required for author tests
+author_requires 'File::Spec'              => 0;
 author_requires 'Pod::Coverage'           => '0.18';
 author_requires 'Test::CleanNamespaces'   => 0;
 author_requires 'Test::ConsistentVersion' => 0;

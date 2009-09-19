@@ -10,6 +10,8 @@ inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/Net/NSCA/Client.pm
+lib/Net/NSCA/Client/DataPacket.pm
+lib/Net/NSCA/Client/InitialPacket.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
