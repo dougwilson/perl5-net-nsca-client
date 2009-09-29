@@ -6,28 +6,35 @@ author   'Douglas Christopher Wilson <doug@somethingdoug.com>';
 license  'perl';
 
 # Modules that are required
-requires 'Convert::Binary::C'        => '0.74';
-requires 'Crypt::Random'             => 0;
-requires 'Digest::CRC'               => 0;
-requires 'Moose'                     => '0.89';
-requires 'MooseX::StrictConstructor' => '0.08';
-requires 'Readonly'                  => '1.03';
-requires 'namespace::clean'          => '0.04';
+requires
+	'Convert::Binary::C'        => '0.74',
+	'Crypt::Random'             => 0,
+	'Digest::CRC'               => 0,
+	'Moose'                     => '0.89',
+	'MooseX::StrictConstructor' => '0.08',
+	'Readonly'                  => '1.03',
+	'namespace::clean'          => '0.04';
 
-test_requires 'Test::More'     => 0;
-test_requires 'Test::Requires' => '0.02';
+# Modules that are required for tests
+test_requires
+	'Test::More'     => 0,
+	'Test::Requires' => '0.02';
 
 # Modules that are required for author tests
-author_requires 'File::Spec'              => 0;
-author_requires 'Pod::Coverage'           => '0.18';
-author_requires 'Test::CleanNamespaces'   => 0;
-author_requires 'Test::ConsistentVersion' => 0;
-author_requires 'Test::DistManifest'      => 0;
-author_requires 'Test::MinimumVersion'    => '0.009';
-author_requires 'Test::Perl::Critic'      => 0;
-author_requires 'Test::Pod'               => '1.22';
-author_requires 'Test::Pod::Content'      => 0;
-author_requires 'Test::Pod::Coverage'     => '1.08';
+author_requires
+	'File::Spec'                      => 0,
+	'Module::Install'                 => '0.91',
+	'Module::Install::AuthorRequires' => '0.02',
+	'Module::Install::AuthorTests'    => '0.002',
+	'Pod::Coverage'                   => '0.18',
+	'Test::CleanNamespaces'           => 0,
+	'Test::ConsistentVersion'         => 0,
+	'Test::DistManifest'              => 0,
+	'Test::MinimumVersion'            => '0.009',
+	'Test::Perl::Critic'              => 0,
+	'Test::Pod'                       => '1.22',
+	'Test::Pod::Content'              => 0,
+	'Test::Pod::Coverage'             => '1.08';
 
 # Enable tests to be in multi-level directories
 tests_recursive;
