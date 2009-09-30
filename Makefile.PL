@@ -10,7 +10,10 @@ requires
 	'Convert::Binary::C'        => '0.74',
 	'Crypt::Random'             => 0,
 	'Digest::CRC'               => 0,
+	'English'                   => 0,
+	'IO::Socket::INET'          => 0,
 	'Moose'                     => '0.89',
+	'MooseX::Clone'             => 0,
 	'MooseX::StrictConstructor' => '0.08',
 	'Readonly'                  => '1.03',
 	'namespace::clean'          => '0.04';
