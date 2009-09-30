@@ -58,6 +58,13 @@ has timeout => (
 
 	default => $DEFAULT_TIMEOUT,
 );
+has transport_layer_security => (
+	is  => 'rw',
+	isa => 'Net::NSCA::Client::Connection::TLS',
+
+	clearer   => 'clear_transport_layer_security',
+	predicate => 'has_transport_layer_security',
+);
 has 'socket' => (
 	is => 'ro',
 
@@ -89,8 +96,19 @@ sub send_data_packet {
 		);
 	}
 
+	# Get the byte representation of the packet
+	my $byte_packet = $data_packet->to_string;
+
+	if ($self->has_transport_layer_security) {
+		# Encrypt the data packet
+		$byte_packet = $self->transport_layer_security->encrypt(
+			byte_stream => $byte_packet,
+			iv          => $self->initial_packet->initialization_vector,
+		);
+	}
+
 	# Send the data packet over the socket
-	if (!defined $self->socket->syswrite($data_packet)) {
+	if (!defined $self->socket->syswrite($byte_packet)) {
 		# An error occurred during transmission
 		confess sprintf 'An error occurred during data packet transmission: %s',
 			$ERRNO;
@@ -237,6 +255,11 @@ This is the port number of the remote NSCA server.
 This is the timeout for reading from the socket. The default is set to
 L</$DEFAULT_TIMEOUT>.
 
+=head2 transport_layer_security
+
+This is a L<Net::NSCA::Client::Connection::TLS> object that specifies the
+transport layer security that will be used when sending the data packet.
+
 =head2 socket
 
 This is the socket object (L<IO::Socket::INET>) that represents the TCP
@@ -247,6 +270,17 @@ connection to the NSCA server.
 =head2 restart
 
 This will restart the connection.
+
+=head2 clear_transport_layer_security
+
+This will clear the L</transport_layer_security> attribute removing any
+transport layer security.
+
+=head2 has_transport_layer_security
+
+This will return a Boolean of if the connection is protected by transport
+layer security (note: the actual encryption level in the TLS object may be
+"none").
 
 =head2 send_data_packet
 
