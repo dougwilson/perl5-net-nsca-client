@@ -16,8 +16,8 @@ use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
 # MODULES
+use Net::NSCA::Client::Connection;
 use Net::NSCA::Client::DataPacket;
-use Net::NSCA::Client::InitialPacket;
 use Readonly 1.03;
 
 ###############################################################################
@@ -26,6 +26,8 @@ use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
 # CONSTANTS
+Readonly our $DEFAULT_PORT    => 5667;
+Readonly our $DEFAULT_TIMEOUT => 10;
 Readonly our $STATUS_OK       => 0;
 Readonly our $STATUS_WARNING  => 1;
 Readonly our $STATUS_CRITICAL => 2;
@@ -33,12 +35,6 @@ Readonly our $STATUS_UNKNOWN  => 3;
 
 ###############################################################################
 # ATTRIBUTES
-has protocol_version => (
-	is  => 'rw',
-	isa => 'Int',
-
-	default => 3,
-);
 has remote_host => (
 	is  => 'rw',
 	isa => 'Str',
@@ -50,11 +46,45 @@ has remote_port => (
 	is  => 'rw',
 	isa => 'Int',
 
-	default => 5667,
+	default => $DEFAULT_PORT,
+);
+has timeout => (
+	is  => 'rw',
+	isa => 'Int',
+
+	default => $DEFAULT_TIMEOUT,
 );
 
 ###############################################################################
 # METHODS
+sub send_report {
+	my ($self, %args) = @_;
+
+	# Splice out the arguments
+	my ($hostname, $service, $message, $status) = @args{qw(
+	     hostname   service   message   status)};
+
+	# Create a new connection to the remote server
+	my $connection = Net::NSCA::Client::Connection->new(
+		remote_host => $self->remote_host,
+		remote_port => $self->remote_port,
+		timeout     => $self->timeout,
+	);
+
+	# Create a data packet to send back
+	my $data_packet = Net::NSCA::Client::DataPacket->new(
+		hostname            => $hostname,
+		service_description => $service,
+		service_message     => $message,
+		service_status      => $status,
+	);
+
+	# Send back the data packet
+	$connection->send_data_packet($data_packet);
+
+	# Nothing good to return, so return self
+	return $self;
+}
 
 ###############################################################################
 # PRIVATE METHODS
@@ -92,9 +122,71 @@ Send passive checks to Nagios locally and remotely.
 
 =head1 CONSTRUCTOR
 
+This is fully object-oriented, and as such before any method can be used, the
+constructor needs to be called to create an object to work with.
+
+=head2 new
+
+This will construct a new object.
+
+=over
+
+=item new(%attributes)
+
+C<%attributes> is a HASH where the keys are attributes (specified in the
+L</ATTRIBUTES> section).
+
+=item new($attributes)
+
+C<$attributes> is a HASHREF where the keys are attributes (specified in the
+L</ATTRIBUTES> section).
+
+=back
+
 =head1 ATTRIBUTES
 
+  # Set an attribute
+  $object->attribute_name($new_value);
+
+  # Get an attribute
+  my $value = $object->attribute_name;
+
+=head2 remote_host
+
+This is the remote host to connect to. This will default to L</$DEFAULT_HOST>.
+
+=head2 remote_port
+
+This is the remote port to connect to. This will default to L</$DEFAULT_PORT>.
+
+=head2 timeout
+
+This is the timeout to use when connecting to the service. This will default to
+L</$DEFAULT_TIMEOUT>.
+
 =head1 METHODS
+
+=head2 send_report
+
+This will send a report on a service to the remote NSCA server. This method
+takes a HASH of arguments with the following keys:
+
+=head3 hostname
+
+This is the hostname of the service that is being reported.
+
+=head3 service
+
+This is the service description of the service that is being reported.
+
+=head3 message
+
+This is the message that the plug in givaes to Nagios.
+
+=head3 status
+
+This is the status code to report to Nagios. You will want to use one of the
+C<$STATUS_*> constants.
 
 =head1 SPECIFICATION
 
@@ -154,9 +246,45 @@ followed by the IV are followed for the password (byte-per-byte, looping).
 All other specified encryption methods are performed in cipher feedback (CFB)
 mode, at one byte.
 
+=head1 CONSTANTS
+
+=head2 C<$DEFAULT_PORT>
+
+This is the default port number to use when connecting to a remote host.
+
+=head2 C<$DEFAULT_TIMEOUT>
+
+This is the default timeout to use when connecting to a remote host.
+
+=head2 C<$STATUS_OK>
+
+This is the status value when a service is OK
+
+=head2 C<$STATUS_WARNING>
+
+This is the status value when a service is WARNING
+
+=head2 C<$STATUS_CRITICAL>
+
+This is the status value when a service is CRITICAL
+
+=head2 C<$STATUS_UNKNOWN>
+
+This is the status value when a service is UNKNOWN
+
 =head1 DEPENDENCIES
 
 =over
+
+=item * L<Moose> 0.89
+
+=item * L<MooseX::StrictConstructor> 0.08
+
+=item * L<Net::NSCA::Client::Connection>
+
+=item * L<Net::NSCA::Client::DataPacket>
+
+=item * L<Readonly> 1.03
 
 =item * L<namespace::clean> 0.04
 

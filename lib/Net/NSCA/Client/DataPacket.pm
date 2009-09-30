@@ -15,6 +15,10 @@ use Moose 0.89;
 use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
+# MOOSE ROLES
+with 'MooseX::Clone';
+
+###############################################################################
 # MODULES
 use Convert::Binary::C 0.74;
 use Digest::CRC qw(crc32);
@@ -374,6 +378,8 @@ representation is what will be sent over the network.
 =item * L<Digest::CRC>
 
 =item * L<Moose> 0.89
+
+=item * L<MooseX::Clone>
 
 =item * L<MooseX::StrictConstructor> 0.08
 

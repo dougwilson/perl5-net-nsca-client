@@ -25,18 +25,15 @@ use Readonly 1.03;
 use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
-# CONSTANTS
-Readonly our $TRANSMITTED_IV_SIZE => 128;
-
-###############################################################################
 # OVERLOADED FUNCTIONS
 __PACKAGE__->meta->add_package_symbol(q{&()}  => sub {                  });
 __PACKAGE__->meta->add_package_symbol(q{&(""} => sub { shift->to_string });
 
 ###############################################################################
 # PRIVATE CONSTANTS
-Readonly my $BYTES_FOR_16BITS => 2;
-Readonly my $BYTES_FOR_32BITS => 4;
+Readonly my $BYTES_FOR_16BITS    => 2;
+Readonly my $BYTES_FOR_32BITS    => 4;
+Readonly my $TRANSMITTED_IV_SIZE => 128;
 
 ###############################################################################
 # ATTRIBUTES
@@ -93,6 +90,8 @@ sub to_string {
 ###############################################################################
 # PRIVATE METHODS
 sub _build_initialization_vector {
+	my ($self) = @_;
+
 	return Crypt::Random::makerandom(
 		Size     => $TRANSMITTED_IV_SIZE,
 		Strength => 1,
