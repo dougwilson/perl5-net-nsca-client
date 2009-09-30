@@ -26,6 +26,7 @@ use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
 # CONSTANTS
+Readonly our $DEFAULT_HOST    => '127.0.0.1';
 Readonly our $DEFAULT_PORT    => 5667;
 Readonly our $DEFAULT_TIMEOUT => 10;
 Readonly our $STATUS_OK       => 0;
@@ -39,8 +40,7 @@ has remote_host => (
 	is  => 'rw',
 	isa => 'Str',
 
-	clearer   => 'clear_remote_host',
-	predicate => 'has_remote_host',
+	default => $DEFAULT_HOST,
 );
 has remote_port => (
 	is  => 'rw',
@@ -247,6 +247,10 @@ All other specified encryption methods are performed in cipher feedback (CFB)
 mode, at one byte.
 
 =head1 CONSTANTS
+
+=head2 C<$DEFAULT_HOST>
+
+The is the default host to use when connecting.
 
 =head2 C<$DEFAULT_PORT>
 
