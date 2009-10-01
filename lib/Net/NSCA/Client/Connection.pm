@@ -279,8 +279,7 @@ transport layer security.
 =head2 has_transport_layer_security
 
 This will return a Boolean of if the connection is protected by transport
-layer security (note: the actual encryption level in the TLS object may be
-"none").
+layer security.
 
 =head2 send_data_packet
 

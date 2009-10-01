@@ -145,7 +145,7 @@ This documentation refers to L<Net::NSCA::Client::Connection::TLS> version
 
   # Create a new connection TLS
   my $tls = Net::NSCA::Client::Connection::TLS->new(
-    encryption_type => $Net::NSCA::Client::Connection::TLS::ENCRYPTION_TYPE_BLOWFISH,
+    encryption_type => 'blowfish',
     password        => $my_secret_password,
   );
 
@@ -229,8 +229,6 @@ B<TODO: Write this>
 =item * L<Moose> 0.89
 
 =item * L<MooseX::StrictConstructor> 0.08
-
-=item * L<Readonly> 1.03
 
 =item * L<namespace::clean> 0.04
 
