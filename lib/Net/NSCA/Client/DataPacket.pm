@@ -172,10 +172,12 @@ ENDC
 
 	# Add the string hooks to all the string members
 	foreach my $string_member (qw(host_name svc_description plugin_output)) {
-		$c->tag("data_packet_struct.$string_member", Hooks => {
-			pack   => [\&_string_randpad_pack, $c->arg(qw(DATA SELF TYPE)), 'data_packet_struct'],
-			unpack =>  \&_string_unpack,
-		});
+		# XXX: THE RANDOMNESS OF THE STRING BREAKS CRC32
+		# XXX: $c->tag("data_packet_struct.$string_member", Hooks => {
+		# XXX: 	pack   => [\&_string_randpad_pack, $c->arg(qw(DATA SELF TYPE)), 'data_packet_struct'],
+		# XXX: 	unpack =>  \&_string_unpack,
+		# XXX: });
+		$c->tag("data_packet_struct.$string_member", Format => 'String');
 	}
 
 	return $c;
