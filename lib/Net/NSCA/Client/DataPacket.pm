@@ -81,7 +81,7 @@ has unix_timestamp => (
 	is  => 'ro',
 	isa => 'Int',
 
-	required => 1,
+	default => sub { scalar time },
 );
 
 ###############################################################################
@@ -357,10 +357,9 @@ L<Net::NSCA::Client>.
 
 =head2 unix_timestamp
 
-B<Required>
-
 This is a UNIX timestamp, which is an integer specifying the number of
-non-leap seconds since the UNIX epoch.
+non-leap seconds since the UNIX epoch. This will default to the current UNIX
+timestamp.
 
 =head1 METHODS
 
