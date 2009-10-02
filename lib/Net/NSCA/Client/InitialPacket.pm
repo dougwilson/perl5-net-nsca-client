@@ -139,7 +139,7 @@ sub _setup_c_object {
 	$c ||= Convert::Binary::C->new;
 
 	# Set the memory structure to store in network order
-	$c->ByteOrder('LittleEndian');
+	$c->ByteOrder('BigEndian');
 
 	# The alignment always seems to be 4 bytes, so set the alignment here
 	$c->Alignment($BYTES_FOR_32BITS);
