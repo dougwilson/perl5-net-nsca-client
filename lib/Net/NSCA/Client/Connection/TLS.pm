@@ -30,6 +30,13 @@ has encryption_type => (
 
 	default => 'xor',
 );
+has password => (
+	is  => 'rw',
+	isa => 'Str',
+
+	clearer   => 'clear_password',
+	predicate => 'has_password',
+);
 
 ###############################################################################
 # METHODS
@@ -37,18 +44,20 @@ sub encrypt {
 	my ($self, %args) = @_;
 
 	# Splice out the arguments
-	my ($byte_stream, $iv, $password) = @args{qw(byte_stream iv password)};
+	my ($byte_stream, $iv) = @args{qw(byte_stream iv)};
 
 	# Set the encrypted byte stream to the byte stream by default
 	my $encrypted_byte_stream = "$byte_stream";
 
 	if ($self->encryption_type eq 'xor') {
 		# This is a custom NSCA XOR "encryption"
-		$encrypted_byte_stream = $self->_xor_encrypt($byte_stream, $iv, $password);
+		$encrypted_byte_stream = $self->_xor_encrypt($byte_stream, $iv);
 	}
 	else {
-		# We will be using Mcrypt for the encryption
-		$encrypted_byte_stream = $self->_mcrypt_encrypt($byte_stream, $iv, $password);
+		# XXX: # We will be using Mcrypt for the encryption
+		# XXX: $encrypted_byte_stream = $self->_mcrypt_encrypt($byte_stream, $iv);
+		# For now, we only do XOR
+		confess 'At this time the only supported encryption is xor';
 	}
 
 	# Return the encrypted byte stream
@@ -58,7 +67,7 @@ sub encrypt {
 ###############################################################################
 # PRIVATE METHODS
 sub _mcrypt_encrypt {
-	my ($self, $byte_stream, $iv, $password) = @_;
+	my ($self, $byte_stream, $iv) = @_;
 
 	if (!eval { require Mcrypt; 1; }) {
 		# The Mcrypt failed to load
@@ -86,7 +95,7 @@ sub _mcrypt_encrypt {
 	$iv = (substr $iv, 0, $mcrypt->{IV_SIZE}) . "\0"x($mcrypt->{IV_SIZE} - length $iv);
 
 	# Initialize the encryption
-	$mcrypt->init($password, $iv);
+	$mcrypt->init($self->password, $iv);
 
 	foreach my $byte_index (0..$#byte_stream) {
 		# Encrypt each byte
@@ -100,13 +109,13 @@ sub _mcrypt_encrypt {
 	return join q{}, @byte_stream;
 }
 sub _xor_encrypt {
-	my ($self, $byte_stream, $iv, $password) = @_;
+	my ($self, $byte_stream, $iv) = @_;
 
 	# Make a byte array of the IV
 	my @byte_iv = split m{}msx, $iv;
 
 	# Make a byte array of the password if there is a password
-	my @byte_password = defined $password ? (split m{}msx, $password) : ();
+	my @byte_password = $self->has_password ? (split m{}msx, $self->password) : ();
 
 	# Convert the byte stream into an array for manipulation
 	my @byte_stream = split m{}msx, $byte_stream;
@@ -115,7 +124,7 @@ sub _xor_encrypt {
 		# Foreach byte in the byte stream, XOR the byte with the IV
 		$byte_stream[$byte_index] ^= $byte_iv[$byte_index % scalar @byte_iv];
 
-		if (defined $password) {
+		if ($self->has_password) {
 			# If there is a password, XOR the byte with the password
 			$byte_stream[$byte_index] ^= $byte_password[$byte_index % scalar @byte_password];
 		}
@@ -193,7 +202,11 @@ L</ATTRIBUTES> section).
 =head2 encryption_type
 
 This is the type of encryption for this transport layer security object. This
-will default to "none".
+will default to "xor".
+
+=head2 password
+
+This is the password to use for the encryption.
 
 =head1 METHODS
 
@@ -213,10 +226,6 @@ This is the byte stream to encrypt.
 B<Required>
 
 This is the initialization vector to use when encrypting the byte stream.
-
-=head3 password
-
-This is the password to use for the encryption.
 
 =head1 CONSTANTS
 

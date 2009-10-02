@@ -17,6 +17,7 @@ use MooseX::StrictConstructor 0.08;
 ###############################################################################
 # MODULES
 use Net::NSCA::Client::Connection;
+use Net::NSCA::Client::Connection::TLS;
 use Net::NSCA::Client::DataPacket;
 use Readonly 1.03;
 
@@ -36,6 +37,19 @@ Readonly our $STATUS_UNKNOWN  => 3;
 
 ###############################################################################
 # ATTRIBUTES
+has encryption_password => (
+	is  => 'rw',
+	isa => 'Str',
+
+	clearer   => 'clear_encryption_password',
+	predicate => 'has_encryption_password',
+);
+has encryption_type => (
+	is  => 'rw',
+	isa => 'Str',
+
+	default => 'none',
+);
 has remote_host => (
 	is  => 'rw',
 	isa => 'Str',
@@ -69,6 +83,14 @@ sub send_report {
 		remote_host => $self->remote_host,
 		remote_port => $self->remote_port,
 		timeout     => $self->timeout,
+
+		($self->encryption_type eq 'none' ? () : (
+			transport_layer_security => Net::NSCA::Client::Connection::TLS->new(
+				encryption_type => $self->encryption_type,
+
+				($self->has_encryption_password ? (password => $self->encryption_password) : ()),
+			)
+		)),
 	);
 
 	# Create a data packet to send back
@@ -151,6 +173,15 @@ L</ATTRIBUTES> section).
   # Get an attribute
   my $value = $object->attribute_name;
 
+=head2 encryption_password
+
+This is the password to use with the encryption.
+
+=head2 encryption_type
+
+This is a string of the encryption type. See L<Net::NSCA::Client::Connection::TLS>
+for the different encryption types.
+
 =head2 remote_host
 
 This is the remote host to connect to. This will default to L</$DEFAULT_HOST>.
@@ -165,6 +196,14 @@ This is the timeout to use when connecting to the service. This will default to
 L</$DEFAULT_TIMEOUT>.
 
 =head1 METHODS
+
+=head2 clear_encryption_password
+
+This will remove the encryption password that is currently set.
+
+=head2 hsa_encryption_password
+
+This will return a Boolean if there is any encryption password.
 
 =head2 send_report
 

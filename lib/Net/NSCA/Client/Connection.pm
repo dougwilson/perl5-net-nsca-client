@@ -130,20 +130,21 @@ sub _build_initial_packet {
 	my $received_bytes;
 	my $previously_read_bytes = 1; # Set to 1 to enter while loop
 
-	# Continue to read until server stops sending data
-	while ($previously_read_bytes > 0) {
-		# Read SOCKET_READ_SIZE bytes
-		$previously_read_bytes = $self->socket->sysread(
-			$received_bytes,
-			$SOCKET_READ_SIZE
-		);
-
-		if (!defined $previously_read_bytes) {
-			# An error occurred during the read
-			confess sprintf 'An error occurred while reading from the socket: %s',
-				$ERRNO;
-		}
-	}
+#	# Continue to read until server stops sending data
+#	while ($previously_read_bytes > 0) {
+#		# Read SOCKET_READ_SIZE bytes
+#		$previously_read_bytes = $self->socket->sysread(
+#			$received_bytes,
+#			$SOCKET_READ_SIZE
+#		);
+#
+#		if (!defined $previously_read_bytes) {
+#			# An error occurred during the read
+#			confess sprintf 'An error occurred while reading from the socket: %s',
+#				$ERRNO;
+#		}
+#	}
+	$received_bytes = join q{}, $self->socket->getlines;
 
 	# Create the initial packet object
 	my $initial_packet = Net::NSCA::Client::InitialPacket->new($received_bytes);
@@ -156,6 +157,7 @@ sub _build_socket {
 
 	# Create the socket
 	my $socket = IO::Socket::INET->new(
+		Blocking => 0,
 		PeerAddr => $self->remote_host,
 		PeerPort => $self->remote_port,
 		Proto    => 'tcp',
