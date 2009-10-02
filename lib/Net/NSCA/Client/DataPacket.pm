@@ -89,7 +89,7 @@ has unix_timestamp => (
 around BUILDARGS => sub {
 	my ($original_method, $class, @args) = @_;
 
-	if (@args == 0 && !ref $args[0]) {
+	if (@args == 1 && !ref $args[0]) {
 		# This should be the packet as a string, so get the new
 		# args from this string
 		@args = _constructor_options_from_string($args[0]);
