@@ -282,7 +282,7 @@ This documentation refers to L<Net::NSCA::Client::DataPacket> version 0.001
 
   # Create a packet from scratch
   my $packet = Net::NSCA::Client::DataPacket->new(
-    hostname            => 'www.example.net,
+    hostname            => 'www.example.net',
     service_description => 'Apache',
     service_message     => 'OK - Apache running',
     service_status      => $Net::NSCA::Client::STATUS_OK,
