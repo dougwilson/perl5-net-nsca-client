@@ -16,7 +16,7 @@ use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
 # MOOSE TYPES
-use Net::NSCA::Client::Library qw(PortNumber);
+use Net::NSCA::Client::Library qw(PortNumber Timeout);
 
 ###############################################################################
 # MODULES
@@ -68,7 +68,7 @@ has remote_port => (
 );
 has timeout => (
 	is  => 'rw',
-	isa => 'Int',
+	isa => Timeout,
 
 	default => $DEFAULT_TIMEOUT,
 );

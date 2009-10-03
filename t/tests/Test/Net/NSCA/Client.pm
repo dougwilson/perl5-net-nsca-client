@@ -122,12 +122,8 @@ sub attribute_timeout : Tests(9) {
 	is $client->timeout, 2, 'Timeout setting works';
 
 	dies_ok { $client->timeout(5.55) } 'Setting timeout to deciman number fails';
-
-	TODO: {
-		local $TODO = 'Need to add type constraints for these';
-		dies_ok { $client->timeout(-2) } 'Setting timeout to negative number fails';
-		dies_ok { $client->timeout(0) } 'Setting timeout to 0 fails';
-	}
+	dies_ok { $client->timeout(-2) } 'Setting timeout to negative number fails';
+	dies_ok { $client->timeout(0) } 'Setting timeout to 0 fails';
 
 	return;
 }

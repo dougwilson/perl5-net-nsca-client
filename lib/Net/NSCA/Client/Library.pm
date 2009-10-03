@@ -14,6 +14,7 @@ our $VERSION   = '0.001';
 use MooseX::Types 0.08 -declare => [qw(
 	InitializationVector
 	PortNumber
+	Timeout
 )];
 
 ###############################################################################
@@ -49,6 +50,11 @@ subtype PortNumber,
 	as Int,
 	where { $_ >= $LOWEST_PORT_NUMBER && $_ <= $HIGHEST_PORT_NUMBER },
 	message { "PortNumber must be between $LOWEST_PORT_NUMBER and $HIGHEST_PORT_NUMBER inclusive" };
+
+subtype Timeout,
+	as Int,
+	where { $_ > 0 },
+	message { 'Timeout must be greater than 0' };
 
 1;
 
