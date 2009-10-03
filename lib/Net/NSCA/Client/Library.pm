@@ -13,11 +13,12 @@ our $VERSION   = '0.001';
 # MOOSE TYPE DECLARATIONS
 use MooseX::Types 0.08 -declare => [qw(
 	InitializationVector
+	PortNumber
 )];
 
 ###############################################################################
 # MOOSE TYPES
-use MooseX::Types::Moose qw(Str);
+use MooseX::Types::Moose qw(Int Str);
 
 ###############################################################################
 # MODULES
@@ -29,17 +30,25 @@ use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
 # CONSTANTS
+Readonly my $HIGHEST_PORT_NUMBER          => 65_535;
 Readonly my $INITIALIZATION_VECTOR_LENGTH => 128;
+Readonly my $LOWEST_PORT_NUMBER           => 0;
 
 ###############################################################################
 # TYPE DEFINITIONS
 subtype InitializationVector,
 	as Str,
-	where { $INITIALIZATION_VECTOR_LENGTH == length };
+	where { $INITIALIZATION_VECTOR_LENGTH == length },
+	message { 'InitializationVector must be 128 bytes' };
 
 coerce InitializationVector,
 	from Str,
 		via { substr($_, 0, $INITIALIZATION_VECTOR_LENGTH) . "\0"x($INITIALIZATION_VECTOR_LENGTH - length) };
+
+subtype PortNumber,
+	as Int,
+	where { $_ >= $LOWEST_PORT_NUMBER && $_ <= $HIGHEST_PORT_NUMBER },
+	message { "PortNumber must be between $LOWEST_PORT_NUMBER and $HIGHEST_PORT_NUMBER inclusive" };
 
 1;
 
@@ -75,6 +84,10 @@ No methods.
 This is the type for the initialization vector. This is a 128 byte string that
 is padded with trailing zeros. Coerces from a Str by chopping or padding to
 128 bytes.
+
+=head2 PortNumber
+
+This is the type for a port number in TCP and UDP.
 
 =head1 DEPENDENCIES
 

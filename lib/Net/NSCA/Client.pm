@@ -15,6 +15,10 @@ use Moose 0.89;
 use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
+# MOOSE TYPES
+use Net::NSCA::Client::Library qw(PortNumber);
+
+###############################################################################
 # MODULES
 use Net::NSCA::Client::Connection;
 use Net::NSCA::Client::Connection::TLS;
@@ -58,7 +62,7 @@ has remote_host => (
 );
 has remote_port => (
 	is  => 'rw',
-	isa => 'Int',
+	isa => PortNumber,
 
 	default => $DEFAULT_PORT,
 );

@@ -68,7 +68,7 @@ sub attribute_remote_host : Tests(6) {
 	return;
 }
 
-sub attribute_remote_port : Tests(10) {
+sub attribute_remote_port : Tests(9) {
 	my ($test) = @_;
 
 	# Get the name of the class we are testing
@@ -92,13 +92,8 @@ sub attribute_remote_port : Tests(10) {
 	is $client->remote_port, 2, 'remote_port setting works';
 
 	dies_ok { $client->remote_port(5.55) } 'Setting remote_port to decimal number fails';
-
-	TODO: {
-		local $TODO = 'Need to add type constraints for these';
-		dies_ok { $client->remote_port(-2) } 'Setting remote_port to negative number fails';
-		dies_ok { $client->remote_port(0) } 'Setting remote_port to 0 fails';
-		dies_ok { $client->remote_port(9564481) } 'Setting remote_port too large fails';
-	}
+	dies_ok { $client->remote_port(-2) } 'Setting remote_port to negative number fails';
+	dies_ok { $client->remote_port(9564481) } 'Setting remote_port too large fails';
 
 	return;
 }
