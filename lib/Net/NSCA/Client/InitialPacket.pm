@@ -30,10 +30,13 @@ __PACKAGE__->meta->add_package_symbol(q{&()}  => sub {                  });
 __PACKAGE__->meta->add_package_symbol(q{&(""} => sub { shift->to_string });
 
 ###############################################################################
+# CONSTANTS
+Readonly my $INITIALIZATION_VECTOR_LENGTH => 128;
+
+###############################################################################
 # PRIVATE CONSTANTS
-Readonly my $BYTES_FOR_16BITS    => 2;
-Readonly my $BYTES_FOR_32BITS    => 4;
-Readonly my $TRANSMITTED_IV_SIZE => 128;
+Readonly my $BYTES_FOR_16BITS => 2;
+Readonly my $BYTES_FOR_32BITS => 4;
 
 ###############################################################################
 # ATTRIBUTES
@@ -93,7 +96,7 @@ sub _build_initialization_vector {
 	my ($self) = @_;
 
 	return Crypt::Random::makerandom_octet(
-		Length   => $TRANSMITTED_IV_SIZE,
+		Length   => $INITIALIZATION_VECTOR_LENGTH,
 		Strength => 1,
 	);
 }
@@ -122,7 +125,7 @@ sub _init_packet_struct {
 	# Add the init_packet_struct structure
 	$c->parse(<<"ENDC");
 		struct init_packet_struct {
-			char      iv[$TRANSMITTED_IV_SIZE];
+			char      iv[$INITIALIZATION_VECTOR_LENGTH];
 			u_int32_t timestamp;
 		};
 ENDC
@@ -263,7 +266,7 @@ string representation is what will be sent over the network.
 
 Constants provided by this library are protected by the L<Readonly> module.
 
-=head2 C<$TRANSMITTED_IV_SIZE>
+=head2 C<$INITIALIZATION_VECTOR_LENGTH>
 
 This is the length of the L</initialization_vector>.
 
