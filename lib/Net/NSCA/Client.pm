@@ -16,7 +16,7 @@ use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
 # MOOSE TYPES
-use Net::NSCA::Client::Library qw(PortNumber Timeout);
+use Net::NSCA::Client::Library qw(Hostname PortNumber Timeout);
 
 ###############################################################################
 # MODULES
@@ -56,7 +56,7 @@ has encryption_type => (
 );
 has remote_host => (
 	is  => 'rw',
-	isa => 'Str',
+	isa => Hostname,
 
 	default => $DEFAULT_HOST,
 );

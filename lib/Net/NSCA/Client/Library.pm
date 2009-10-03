@@ -12,6 +12,7 @@ our $VERSION   = '0.001';
 ###############################################################################
 # MOOSE TYPE DECLARATIONS
 use MooseX::Types 0.08 -declare => [qw(
+	Hostname
 	InitializationVector
 	PortNumber
 	Timeout
@@ -23,6 +24,7 @@ use MooseX::Types::Moose qw(Int Str);
 
 ###############################################################################
 # MODULES
+use Data::Validate::Domain 0.02;
 use Readonly 1.03;
 
 ###############################################################################
@@ -37,6 +39,11 @@ Readonly my $LOWEST_PORT_NUMBER           => 0;
 
 ###############################################################################
 # TYPE DEFINITIONS
+subtype Hostname,
+	as Str,
+	where { Data::Validate::Domain::is_hostname($_) },
+	message { 'Must be a valid hostname' };
+
 subtype InitializationVector,
 	as Str,
 	where { $INITIALIZATION_VECTOR_LENGTH == length },
@@ -85,6 +92,11 @@ No methods.
 
 =head1 TYPES PROVIDED
 
+=head2 Hostname
+
+This specifies a hostname. This is validated using the
+L<Data::Validate::Domain> library with the C<is_hostname> function.
+
 =head2 InitializationVector
 
 This is the type for the initialization vector. This is a 128 byte string that
@@ -101,9 +113,13 @@ This module is dependent on the following modules:
 
 =over 4
 
+=item * L<Data::Validate::Domain> 0.02
+
 =item * L<MooseX::Types> 0.08
 
 =item * L<MooseX::Types::Moose>
+
+=item * L<Readonly> 1.03
 
 =item * L<namespace::clean> 0.04
 
