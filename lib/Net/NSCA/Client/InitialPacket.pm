@@ -92,8 +92,8 @@ sub to_string {
 sub _build_initialization_vector {
 	my ($self) = @_;
 
-	return Crypt::Random::makerandom(
-		Size     => $TRANSMITTED_IV_SIZE,
+	return Crypt::Random::makerandom_octet(
+		Length   => $TRANSMITTED_IV_SIZE,
 		Strength => 1,
 	);
 }
