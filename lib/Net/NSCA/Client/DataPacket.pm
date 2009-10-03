@@ -353,9 +353,13 @@ report will be listed under.
 
 =head2 service_message
 
+B<Required>
+
 This is the message that will be given to Nagios.
 
 =head2 service_status
+
+B<Required>
 
 This is the status of the service that will be given to Nagios. It is
 recommended to use one of the C<$STATUS_> constants provided by
