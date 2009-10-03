@@ -1,4 +1,6 @@
 Revision history for Net-NSCA-Client
 
-0.001 Date/time
-  * First version, released on an unsuspecting world.
+0.001 Tue, October 1, 2009 20:35:12 -0500
+  * First release.
+  * NOTE: There are currently no tests besides a load test, so there
+    is no real way to know if it is working on your system when installing.

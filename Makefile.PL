@@ -5,6 +5,10 @@ all_from 'lib/Net/NSCA/Client.pm';
 author   'Douglas Christopher Wilson <doug@somethingdoug.com>';
 license  'perl';
 
+# Resources
+resources homepage   => 'http://github.com/dougwilson/perl5-net-nsca-client/';
+resources repository => 'git://github.com/dougwilson/perl5-net-nsca-client.git';
+
 # Modules that are required
 requires
 	'Convert::Binary::C'        => '0.74',
