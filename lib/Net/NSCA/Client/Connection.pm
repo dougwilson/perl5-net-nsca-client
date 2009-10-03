@@ -15,6 +15,10 @@ use Moose 0.89;
 use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
+# MOOSE TYPES
+use Net::NSCA::Client::Library qw(PortNumber Timeout);
+
+###############################################################################
 # MODULES
 use English qw(-no_match_vars);
 use IO::Socket::INET;
@@ -48,13 +52,13 @@ has remote_host => (
 );
 has remote_port => (
 	is  => 'ro',
-	isa => 'Int',
+	isa => PortNumber,
 
 	required => 1,
 );
 has timeout => (
 	is  => 'rw',
-	isa => 'Int',
+	isa => Timeout,
 
 	default => $DEFAULT_TIMEOUT,
 );
