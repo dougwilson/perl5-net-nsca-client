@@ -24,7 +24,8 @@ requires
 
 # Modules that are required for tests
 test_requires
-	'Test::More'     => 0,
+	'Test::Class'    => '0.33',
+	'Test::Most'     => 0,
 	'Test::Requires' => '0.02';
 
 # Modules that are required for author tests
