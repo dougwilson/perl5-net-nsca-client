@@ -14,6 +14,7 @@ lib/Net/NSCA/Client/Connection.pm
 lib/Net/NSCA/Client/Connection/TLS.pm
 lib/Net/NSCA/Client/DataPacket.pm
 lib/Net/NSCA/Client/InitialPacket.pm
+lib/Net/NSCA/Client/Library.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml

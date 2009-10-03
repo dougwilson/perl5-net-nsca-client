@@ -19,6 +19,7 @@ requires
 	'Moose'                     => '0.89',
 	'MooseX::Clone'             => 0,
 	'MooseX::StrictConstructor' => '0.08',
+	'MooseX::Types'             => '0.08',
 	'Readonly'                  => '1.03',
 	'namespace::clean'          => '0.04';
 

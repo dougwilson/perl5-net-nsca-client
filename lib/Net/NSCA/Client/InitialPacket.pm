@@ -15,6 +15,10 @@ use Moose 0.89;
 use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
+# MOOSE TYPES
+use Net::NSCA::Client::Library qw(InitializationVector);
+
+###############################################################################
 # MODULES
 use Convert::Binary::C 0.74;
 use Crypt::Random;
@@ -31,7 +35,7 @@ __PACKAGE__->meta->add_package_symbol(q{&(""} => sub { shift->to_string });
 
 ###############################################################################
 # CONSTANTS
-Readonly my $INITIALIZATION_VECTOR_LENGTH => 128;
+Readonly our $INITIALIZATION_VECTOR_LENGTH => 128;
 
 ###############################################################################
 # PRIVATE CONSTANTS
@@ -42,9 +46,10 @@ Readonly my $BYTES_FOR_32BITS => 4;
 # ATTRIBUTES
 has initialization_vector => (
 	is  => 'ro',
-	isa => 'Str',
+	isa => InitializationVector,
 
 	builder => '_build_initialization_vector',
+	coerce  => 1,
 );
 has unix_timestamp => (
 	is  => 'ro',

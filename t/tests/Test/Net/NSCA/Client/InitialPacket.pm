@@ -48,7 +48,7 @@ sub constructor_new : Tests(4) {
 	return;
 }
 
-sub attribute_initialization_vector : Tests(no_plan) {
+sub attribute_initialization_vector : Tests(3) {
 	my ($test) = @_;
 
 	# Get the name of the class we are testing
@@ -67,8 +67,7 @@ sub attribute_initialization_vector : Tests(no_plan) {
 	# Get a custom packet
 	$packet = $class->new(initialization_vector => 'IamBADiv');
 
-	TODO: {
-		local $TODO = 'Make custom IV pad to correct length';
+	{
 		no strict 'refs';
 		is length($packet->initialization_vector), 128, 'Custom iv is right length';
 	}
