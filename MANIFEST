@@ -21,6 +21,7 @@ README
 t/run.t
 t/tests/Test/Net/NSCA/Client.pm
 t/tests/Test/Net/NSCA/Client/DataPacket.pm
+t/tests/Test/Net/NSCA/Client/InitialPacket.pm
 xt/clean-namespaces.t
 xt/consistent-version.t
 xt/critic.t
