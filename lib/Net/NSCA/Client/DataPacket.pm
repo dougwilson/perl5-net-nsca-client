@@ -259,6 +259,10 @@ sub _string_unpack {
 	return pack 'Z*', @{$c_string_struct->{buf}};
 }
 
+###############################################################################
+# MAKE MOOSE OBJECT IMMUTABLE
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__

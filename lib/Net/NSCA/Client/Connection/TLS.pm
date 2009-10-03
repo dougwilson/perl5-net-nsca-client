@@ -134,6 +134,10 @@ sub _xor_encrypt {
 	return join q{}, @byte_stream;
 }
 
+###############################################################################
+# MAKE MOOSE OBJECT IMMUTABLE
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__

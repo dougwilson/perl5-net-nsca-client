@@ -109,7 +109,8 @@ sub send_report {
 }
 
 ###############################################################################
-# PRIVATE METHODS
+# MAKE MOOSE OBJECT IMMUTABLE
+__PACKAGE__->meta->make_immutable;
 
 1;
 

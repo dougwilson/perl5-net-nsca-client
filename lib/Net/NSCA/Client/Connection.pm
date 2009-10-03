@@ -174,6 +174,10 @@ sub _build_socket {
 	return $socket;
 }
 
+###############################################################################
+# MAKE MOOSE OBJECT IMMUTABLE
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__

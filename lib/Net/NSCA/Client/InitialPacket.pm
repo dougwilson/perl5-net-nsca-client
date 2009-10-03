@@ -170,6 +170,10 @@ sub _setup_c_object {
 	return $c;
 }
 
+###############################################################################
+# MAKE MOOSE OBJECT IMMUTABLE
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__
