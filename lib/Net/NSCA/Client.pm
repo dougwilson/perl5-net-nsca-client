@@ -7,12 +7,16 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 ###############################################################################
 # MOOSE
 use Moose 0.89;
 use MooseX::StrictConstructor 0.08;
+
+###############################################################################
+# MOOSE TYPES
+use Net::NSCA::Client::Library qw(Hostname PortNumber Timeout);
 
 ###############################################################################
 # MODULES
@@ -52,19 +56,19 @@ has encryption_type => (
 );
 has remote_host => (
 	is  => 'rw',
-	isa => 'Str',
+	isa => Hostname,
 
 	default => $DEFAULT_HOST,
 );
 has remote_port => (
 	is  => 'rw',
-	isa => 'Int',
+	isa => PortNumber,
 
 	default => $DEFAULT_PORT,
 );
 has timeout => (
 	is  => 'rw',
-	isa => 'Int',
+	isa => Timeout,
 
 	default => $DEFAULT_TIMEOUT,
 );
@@ -109,7 +113,8 @@ sub send_report {
 }
 
 ###############################################################################
-# PRIVATE METHODS
+# MAKE MOOSE OBJECT IMMUTABLE
+__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -121,7 +126,7 @@ Net::NSCA::Client - Send passive checks to Nagios locally and remotely.
 
 =head1 VERSION
 
-This documnetation refers to L<Net::NSCA::Client> version 0.001
+This documnetation refers to L<Net::NSCA::Client> version 0.002
 
 =head1 SYNOPSIS
 
@@ -330,6 +335,20 @@ This is the status value when a service is UNKNOWN
 =item * L<Readonly> 1.03
 
 =item * L<namespace::clean> 0.04
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Nagios::NSCA::Client> is a semi-new NSCA client that works, but
+contains no documentation or tests.
+
+=item * L<Net::Nsca> is one of the original NSCA Perl modules.
+
+=item * L<POE::Component::Client::NSCA> is a NSCA client that is made for
+L<POE>.
 
 =back
 

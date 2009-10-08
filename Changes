@@ -1,4 +1,21 @@
 Revision history for Net-NSCA-Client
+====================================
+
+0.002 Thu, October 8, 2009 17:35:10 -0500
+  * FIX: All Moose classes are now immutable
+  * FIX: Creating a Net::NSCA::Client::InitialPacket without an IV would
+    cause an error since the default ended up being a Math::Pari object
+    [NOTE: This only would have affected code which explicitly created
+     a Net::NSCA::Client::InitialPacket object]
+  * Added a public constant $INITIALIZATION_VECTOR_LENGTH to
+    Net::NSCA::Client::InitialPacket
+  * initialization_vector attribute in Net::NSCA::Client::InitialPacket
+    is now always exactly 128 bytes.
+  * Fixed documentation in Net::NSCA::Client::DataPacket to specify all
+    required attributes.
+  * Added SEE ALSO section in Net::NSCA::Client
+  * Added tests for many pieces of the objects and for packet reading
+    and creation.
 
 0.001 Tue, October 1, 2009 20:35:12 -0500
   * First release.

@@ -7,12 +7,16 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 ###############################################################################
 # MOOSE
 use Moose 0.89;
 use MooseX::StrictConstructor 0.08;
+
+###############################################################################
+# MOOSE TYPES
+use Net::NSCA::Client::Library qw(Hostname PortNumber Timeout);
 
 ###############################################################################
 # MODULES
@@ -42,19 +46,19 @@ has initial_packet => (
 );
 has remote_host => (
 	is  => 'ro',
-	isa => 'Str',
+	isa => Hostname,
 
 	required => 1,
 );
 has remote_port => (
 	is  => 'ro',
-	isa => 'Int',
+	isa => PortNumber,
 
 	required => 1,
 );
 has timeout => (
 	is  => 'rw',
-	isa => 'Int',
+	isa => Timeout,
 
 	default => $DEFAULT_TIMEOUT,
 );
@@ -174,6 +178,10 @@ sub _build_socket {
 	return $socket;
 }
 
+###############################################################################
+# MAKE MOOSE OBJECT IMMUTABLE
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__
@@ -185,7 +193,7 @@ the server.
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::Connection> version 0.001
+This documentation refers to L<Net::NSCA::Client::Connection> version 0.002
 
 =head1 SYNOPSIS
 

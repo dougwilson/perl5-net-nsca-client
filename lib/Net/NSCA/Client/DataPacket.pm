@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 ###############################################################################
 # MOOSE
@@ -259,6 +259,10 @@ sub _string_unpack {
 	return pack 'Z*', @{$c_string_struct->{buf}};
 }
 
+###############################################################################
+# MAKE MOOSE OBJECT IMMUTABLE
+__PACKAGE__->meta->make_immutable;
+
 1;
 
 __END__
@@ -269,7 +273,7 @@ Net::NSCA::Client::DataPacket - Implements data packet for the NSCA protocol
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::DataPacket> version 0.001
+This documentation refers to L<Net::NSCA::Client::DataPacket> version 0.002
 
 =head1 SYNOPSIS
 
@@ -278,7 +282,7 @@ This documentation refers to L<Net::NSCA::Client::DataPacket> version 0.001
 
   # Create a packet from scratch
   my $packet = Net::NSCA::Client::DataPacket->new(
-    hostname            => 'www.example.net,
+    hostname            => 'www.example.net',
     service_description => 'Apache',
     service_message     => 'OK - Apache running',
     service_status      => $Net::NSCA::Client::STATUS_OK,
@@ -349,9 +353,13 @@ report will be listed under.
 
 =head2 service_message
 
+B<Required>
+
 This is the message that will be given to Nagios.
 
 =head2 service_status
+
+B<Required>
 
 This is the status of the service that will be given to Nagios. It is
 recommended to use one of the C<$STATUS_> constants provided by

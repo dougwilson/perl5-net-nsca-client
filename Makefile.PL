@@ -13,18 +13,21 @@ resources repository => 'git://github.com/dougwilson/perl5-net-nsca-client.git';
 requires
 	'Convert::Binary::C'        => '0.74',
 	'Crypt::Random'             => 0,
+	'Data::Validate::Domain'    => '0.02',
 	'Digest::CRC'               => 0,
 	'English'                   => 0,
 	'IO::Socket::INET'          => 0,
 	'Moose'                     => '0.89',
 	'MooseX::Clone'             => 0,
 	'MooseX::StrictConstructor' => '0.08',
+	'MooseX::Types'             => '0.08',
 	'Readonly'                  => '1.03',
 	'namespace::clean'          => '0.04';
 
 # Modules that are required for tests
 test_requires
-	'Test::More'     => 0,
+	'Test::Class'    => '0.33',
+	'Test::Most'     => 0,
 	'Test::Requires' => '0.02';
 
 # Modules that are required for author tests
