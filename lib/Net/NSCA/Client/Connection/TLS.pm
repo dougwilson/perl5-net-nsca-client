@@ -54,8 +54,6 @@ sub encrypt {
 		$encrypted_byte_stream = $self->_xor_encrypt($byte_stream, $iv);
 	}
 	else {
-		# XXX: # We will be using Mcrypt for the encryption
-		# XXX: $encrypted_byte_stream = $self->_mcrypt_encrypt($byte_stream, $iv);
 		# For now, we only do XOR
 		confess 'At this time the only supported encryption is xor';
 	}
@@ -66,48 +64,6 @@ sub encrypt {
 
 ###############################################################################
 # PRIVATE METHODS
-sub _mcrypt_encrypt {
-	my ($self, $byte_stream, $iv) = @_;
-
-	if (!eval { require Mcrypt; 1; }) {
-		# The Mcrypt failed to load
-		confess sprintf 'To use encryption methods, the Mcrypt library must be present. %s',
-			$EVAL_ERROR;
-	}
-
-	# Initialize Mcrypt
-	my $mcrypt = Mcrypt->new(
-		algorithm => $self->encryption_type,
-		mode      => 'cfb',
-		verbose   => 0,
-	);
-
-	if (!defined $mcrypt) {
-		# Unable to initialize the Mcrypt
-		confess 'Unable to initialize Mcrypt; unknown encryption type %s',
-			$self->encryption_type;
-	}
-
-	# Convert the byte stream into an array for manipulation
-	my @byte_stream = split m{}msx, $byte_stream;
-
-	# Cut or pad the IV to the IV size for the given type
-	$iv = (substr $iv, 0, $mcrypt->{IV_SIZE}) . "\0"x($mcrypt->{IV_SIZE} - length $iv);
-
-	# Initialize the encryption
-	$mcrypt->init($self->password, $iv);
-
-	foreach my $byte_index (0..$#byte_stream) {
-		# Encrypt each byte
-		$byte_stream[$byte_index] = $mcrypt->encrypt($byte_stream[$byte_index]);
-	}
-
-	# End the encryption
-	$mcrypt->end;
-
-	# Return the manipulated byte stream
-	return join q{}, @byte_stream;
-}
 sub _xor_encrypt {
 	my ($self, $byte_stream, $iv) = @_;
 
@@ -158,7 +114,7 @@ This documentation refers to L<Net::NSCA::Client::Connection::TLS> version
 
   # Create a new connection TLS
   my $tls = Net::NSCA::Client::Connection::TLS->new(
-    encryption_type => 'blowfish',
+    encryption_type => 'xor',
     password        => $my_secret_password,
   );
 
