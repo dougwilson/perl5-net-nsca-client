@@ -338,6 +338,20 @@ This is the status value when a service is UNKNOWN
 
 =back
 
+=head1 SEE ALSO
+
+=over
+
+=item * L<Nagios::NSCA::Client> is a semi-new NSCA client that works, but
+contains no documentation or tests.
+
+=item * L<Net::Nsca> is one of the original NSCA Perl modules.
+
+=item * L<POE::Component::Client::NSCA> is a NSCA client that is made for
+L<POE>.
+
+=back
+
 =head1 AUTHOR
 
 Douglas Christopher Wilson, C<< <doug at somethingdoug.com> >>
