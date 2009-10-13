@@ -41,7 +41,7 @@ author_requires
 	'Test::ConsistentVersion'         => 0,
 	'Test::DistManifest'              => 0,
 	'Test::MinimumVersion'            => '0.009',
-	'Test::Perl::Critic'              => 0,
+	'Test::Perl::Critic'              => '1.01',
 	'Test::Pod'                       => '1.22',
 	'Test::Pod::Content'              => 0,
 	'Test::Pod::Coverage'             => '1.08';
