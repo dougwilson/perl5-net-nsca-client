@@ -48,7 +48,7 @@ sub constructor_new : Tests(4) {
 	return;
 }
 
-sub attribute_initialization_vector : Tests(3) {
+sub attribute_initialization_vector : Tests(4) {
 	my ($test) = @_;
 
 	# Get the name of the class we are testing
@@ -62,6 +62,7 @@ sub attribute_initialization_vector : Tests(3) {
 	{
 		no strict 'refs';
 		is length($packet->initialization_vector), 128, 'Default iv is right length';
+		like $packet->initialization_vector, qr{[^\000]{5}\z}msx, 'Default iv looks kind of randomish';
 	}
 
 	# Get a custom packet

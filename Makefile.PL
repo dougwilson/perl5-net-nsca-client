@@ -12,7 +12,7 @@ resources repository => 'git://github.com/dougwilson/perl5-net-nsca-client.git';
 # Modules that are required
 requires
 	'Convert::Binary::C'        => '0.74',
-	'Crypt::Random'             => 0,
+	'Data::Rand::Obscure'       => '0.020',
 	'Data::Validate::Domain'    => '0.02',
 	'Digest::CRC'               => 0,
 	'English'                   => 0,

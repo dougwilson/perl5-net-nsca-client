@@ -21,7 +21,7 @@ use Net::NSCA::Client::Library qw(InitializationVector);
 ###############################################################################
 # MODULES
 use Convert::Binary::C 0.74;
-use Crypt::Random;
+use Data::Rand::Obscure 0.020;
 use Readonly 1.03;
 
 ###############################################################################
@@ -100,9 +100,8 @@ sub to_string {
 sub _build_initialization_vector {
 	my ($self) = @_;
 
-	return Crypt::Random::makerandom_octet(
-		Length   => $INITIALIZATION_VECTOR_LENGTH,
-		Strength => 1,
+	return Data::Rand::Obscure::create_bin(
+		length => $INITIALIZATION_VECTOR_LENGTH,
 	);
 }
 
