@@ -26,9 +26,10 @@ requires
 
 # Modules that are required for tests
 test_requires
-	'Test::Class'    => '0.33',
-	'Test::Most'     => 0,
-	'Test::Requires' => '0.02';
+	'Test::Class'     => '0.33',
+	'Test::Exception' => '0.03',
+	'Test::More'      => '0.18',
+	'Test::Requires'  => '0.02';
 
 # Modules that are required for author tests
 author_requires
