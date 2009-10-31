@@ -11,6 +11,12 @@ To install this module, run the following commands:
     make test
     make install
 
+SCRIPTS
+-------
+
+This distribution comes with useful scripts in the `bin/` directory which
+you may want to use.
+
 SUPPORT AND DOCUMENTATION
 -------------------------
 
