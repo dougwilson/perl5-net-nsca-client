@@ -1,6 +1,14 @@
 Revision history for Net-NSCA-Client
 ====================================
 
+0.003 Sat, October 31, 2009 16:40:01 -0500
+  * New bin/send_nsca utility. This is an emulation of the send_nsca
+    utility that comes with the NSCA package.
+  * Changed from using Crypt::Random to Data::Rand::Obscure for generation
+    of random IV when creating a Net::NSCA::Client::InitialPacket (note:
+    this package itself never uses this feature).
+  * No longer use Test::Most in tests, as it was unnecessary.
+
 0.002 Thu, October 8, 2009 17:35:10 -0500
   * FIX: All Moose classes are now immutable
   * FIX: Creating a Net::NSCA::Client::InitialPacket without an IV would

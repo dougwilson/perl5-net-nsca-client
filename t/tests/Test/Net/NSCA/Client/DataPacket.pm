@@ -3,7 +3,8 @@ package Test::Net::NSCA::Client::DataPacket;
 use strict;
 use warnings 'all';
 
-use Test::Most;
+use Test::Exception 0.03;
+use Test::More 0.18;
 
 use base 'Test::Class';
 
