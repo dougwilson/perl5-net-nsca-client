@@ -7,7 +7,7 @@ use warnings 'all';
 ###########################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.002';
+our $VERSION   = '0.003';
 
 ###########################################################################
 # MODULES
@@ -176,7 +176,7 @@ send_nsca - Send reports to NSCA just like send_nsca in NSCA 2.7.2
 
 =head1 VERSION
 
-This documentation refers to send_nsca version 0.002
+This documentation refers to send_nsca version 0.003
 
 =head1 DESCRIPTION
 

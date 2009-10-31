@@ -1,4 +1,4 @@
-Net-NSCA-Client 0.002
+Net-NSCA-Client 0.003
 =====================
 
 INSTALLATION
