@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.002';
+our $VERSION   = '0.003';
 
 ###############################################################################
 # MOOSE
@@ -192,7 +192,7 @@ protocol
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::InitialPacket> version 0.002
+This documentation refers to L<Net::NSCA::Client::InitialPacket> version 0.003
 
 =head1 SYNOPSIS
 
@@ -280,7 +280,7 @@ This is the length of the L</initialization_vector>.
 
 =item * L<Convert::Binary::C> 0.74
 
-=item * L<Crypt::Random>
+=item * L<Data::Rand::Obscure> 0.020
 
 =item * L<Moose> 0.89
 
