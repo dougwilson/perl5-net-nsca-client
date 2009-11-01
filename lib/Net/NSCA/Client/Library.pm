@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.003';
+our $VERSION   = '0.004';
 
 ###############################################################################
 # MOOSE TYPE DECLARATIONS
@@ -73,7 +73,7 @@ Net::NSCA::Client::Library - Types library
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::Library> version 0.003
+This documentation refers to L<Net::NSCA::Client::Library> version 0.004
 
 =head1 SYNOPSIS
 

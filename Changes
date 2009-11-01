@@ -1,6 +1,10 @@
 Revision history for Net-NSCA-Client
 ====================================
 
+0.004 Sat, October 31, 2009 20:50:12 -0500
+  * Modified t/send_nsca.t test so that the non-present required modules
+    for the utility will not cause the entire module to fail.
+
 0.003 Sat, October 31, 2009 16:40:01 -0500
   * New bin/send_nsca utility. This is an emulation of the send_nsca
     utility that comes with the NSCA package.
