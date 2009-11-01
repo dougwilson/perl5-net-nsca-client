@@ -13,8 +13,9 @@ our $VERSION   = '0.004';
 # MODULES
 use Carp qw(confess);
 use English qw(-no_match_vars);
-use Getopt::Long 2.33;
+use Getopt::Long 2.33 qw(:config auto_help auto_version);
 use Net::NSCA::Client 0.001;
+use Pod::Usage 1.36;
 use Readonly 1.03;
 
 ###########################################################################
