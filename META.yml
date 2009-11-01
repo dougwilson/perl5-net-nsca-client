@@ -41,4 +41,4 @@ resources:
   homepage: http://github.com/dougwilson/perl5-net-nsca-client/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/dougwilson/perl5-net-nsca-client.git
-version: 0.004
+version: 0.005
