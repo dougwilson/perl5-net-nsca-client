@@ -6,15 +6,22 @@ use warnings 'all';
 
 use Test::Command 0.08 tests => 1;
 use Test::More 0.94;
+use Test::Requires 0.02 {
+	'Getopt::Long' => 2.33,
+};
 
 my $send_nsca = 'bin/send_nsca';
 
 ###########################################################################
 # TEST USAGE MESSAGE
 subtest 'Usage statement' => sub {
-	plan tests => 14;
 
 	my $cmd = Test::Command->new(cmd => [$^X, $send_nsca, '--help']);
+
+	# Pod::Usage is required
+	Test::Requires->import('Pod::Usage');
+
+	plan tests => 14;
 
 	$cmd->exit_is_num(0, 'Exits with 0');
 	$cmd->stderr_is_eq(q{}, 'Prints nothing on stderr');
