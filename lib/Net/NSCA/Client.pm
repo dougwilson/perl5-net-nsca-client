@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.004';
+our $VERSION   = '0.005';
 
 ###############################################################################
 # MOOSE
@@ -126,7 +126,7 @@ Net::NSCA::Client - Send passive checks to Nagios locally and remotely.
 
 =head1 VERSION
 
-This documnetation refers to L<Net::NSCA::Client> version 0.004
+This documnetation refers to L<Net::NSCA::Client> version 0.005
 
 =head1 SYNOPSIS
 
