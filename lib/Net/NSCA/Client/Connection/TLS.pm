@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.004';
+our $VERSION   = '0.005';
 
 ###############################################################################
 # MOOSE
@@ -106,7 +106,7 @@ a connection.
 =head1 VERSION
 
 This documentation refers to L<Net::NSCA::Client::Connection::TLS> version
-0.004
+0.005
 
 =head1 SYNOPSIS
 
