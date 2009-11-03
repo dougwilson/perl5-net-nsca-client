@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.005';
+our $VERSION   = '0.006';
 
 ###############################################################################
 # MOOSE
@@ -132,23 +132,11 @@ sub _build_initial_packet {
 
 	# Create a scalar to store recieved bytes in
 	my $received_bytes;
-	my $previously_read_bytes = 1; # Set to 1 to enter while loop
 
-#	# Continue to read until server stops sending data
-#	while ($previously_read_bytes > 0) {
-#		# Read SOCKET_READ_SIZE bytes
-#		$previously_read_bytes = $self->socket->sysread(
-#			$received_bytes,
-#			$SOCKET_READ_SIZE
-#		);
-#
-#		if (!defined $previously_read_bytes) {
-#			# An error occurred during the read
-#			confess sprintf 'An error occurred while reading from the socket: %s',
-#				$ERRNO;
-#		}
-#	}
-	$received_bytes = join q{}, $self->socket->getlines;
+	# Read the bytes
+	## no critic (Subroutines::ProtectPrivateSubs)
+	$self->socket->sysread($received_bytes,
+		Net::NSCA::Client::InitialPacket::_init_packet_struct()->sizeof('init_packet_struct'));
 
 	# Create the initial packet object
 	my $initial_packet = Net::NSCA::Client::InitialPacket->new($received_bytes);
@@ -161,7 +149,7 @@ sub _build_socket {
 
 	# Create the socket
 	my $socket = IO::Socket::INET->new(
-		Blocking => 0,
+		Blocking => 1,
 		PeerAddr => $self->remote_host,
 		PeerPort => $self->remote_port,
 		Proto    => 'tcp',
@@ -193,7 +181,7 @@ the server.
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::Connection> version 0.005
+This documentation refers to L<Net::NSCA::Client::Connection> version 0.006
 
 =head1 SYNOPSIS
 

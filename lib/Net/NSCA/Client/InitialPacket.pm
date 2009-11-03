@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.005';
+our $VERSION   = '0.006';
 
 ###############################################################################
 # MOOSE
@@ -192,7 +192,7 @@ protocol
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::InitialPacket> version 0.005
+This documentation refers to L<Net::NSCA::Client::InitialPacket> version 0.006
 
 =head1 SYNOPSIS
 
