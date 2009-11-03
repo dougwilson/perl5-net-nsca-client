@@ -1,6 +1,13 @@
 Revision history for Net-NSCA-Client
 ====================================
 
+0.006 Tue, November 3, 2009 10:56:45 -0500
+  * THIS CONTAINS AN IMPORTANT FIX AND PREVIOUS VERSIONS ARE NOT
+    RECOMMENDED.
+  * Fixed an issue where the client would try to parse the initial
+    packet too early and throw an error about the UNIX timestamp
+    not meeting a type constraint.
+
 0.005 Sun, November 1, 2009 01:35:12 -0500
   * Finally fixed the test failures for t/send_nsca.t by requiring
     Pod::Usage 1.36+ for the script.
