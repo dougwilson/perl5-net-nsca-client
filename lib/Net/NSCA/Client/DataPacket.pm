@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.005';
+our $VERSION   = '0.006';
 
 ###############################################################################
 # MOOSE
@@ -273,7 +273,7 @@ Net::NSCA::Client::DataPacket - Implements data packet for the NSCA protocol
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::DataPacket> version 0.005
+This documentation refers to L<Net::NSCA::Client::DataPacket> version 0.006
 
 =head1 SYNOPSIS
 

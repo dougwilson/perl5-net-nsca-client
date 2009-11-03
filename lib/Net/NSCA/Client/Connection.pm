@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.005';
+our $VERSION   = '0.006';
 
 ###############################################################################
 # MOOSE
@@ -134,6 +134,7 @@ sub _build_initial_packet {
 	my $received_bytes;
 
 	# Read the bytes
+	## no critic (Subroutines::ProtectPrivateSubs)
 	$self->socket->sysread($received_bytes,
 		Net::NSCA::Client::InitialPacket::_init_packet_struct()->sizeof('init_packet_struct'));
 
@@ -180,7 +181,7 @@ the server.
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::Connection> version 0.005
+This documentation refers to L<Net::NSCA::Client::Connection> version 0.006
 
 =head1 SYNOPSIS
 
