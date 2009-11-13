@@ -23,6 +23,25 @@ no_index:
     - inc
     - t
     - xt
+provides:
+  Net::NSCA::Client:
+    file: lib/Net/NSCA/Client.pm
+    version: 0.006
+  Net::NSCA::Client::Connection:
+    file: lib/Net/NSCA/Client/Connection.pm
+    version: 0.006
+  Net::NSCA::Client::Connection::TLS:
+    file: lib/Net/NSCA/Client/Connection/TLS.pm
+    version: 0.006
+  Net::NSCA::Client::DataPacket:
+    file: lib/Net/NSCA/Client/DataPacket.pm
+    version: 0.006
+  Net::NSCA::Client::InitialPacket:
+    file: lib/Net/NSCA/Client/InitialPacket.pm
+    version: 0.006
+  Net::NSCA::Client::Library:
+    file: lib/Net/NSCA/Client/Library.pm
+    version: 0.006
 requires:
   Convert::Binary::C: 0.74
   Data::Rand::Obscure: 0.020

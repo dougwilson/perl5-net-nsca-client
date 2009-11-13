@@ -54,4 +54,7 @@ tests_recursive;
 # Author tests in xt/
 recursive_author_tests('xt');
 
+# Write the provided classes in the META
+auto_provides;
+
 WriteAll;
