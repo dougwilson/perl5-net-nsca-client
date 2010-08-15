@@ -1,6 +1,9 @@
 exclude  = Miscellanea::RequireRcsKeywords
 severity = 1
 
+[Documentation::PodSpelling]
+stop_words = AnnoCPAN CFB CPAN CPAN's CRC HASHREF hostname InitializationVector IP Nagios NSCA NULLs obfucated octothorpe perldoc PortNumber Readonly STDERR Str TCP timestamp TODO UDP XOR'd
+
 [Documentation::RequirePodSections]
 lib_sections    = NAME | VERSION | SYNOPSIS | DESCRIPTION | METHODS | DEPENDENCIES | BUGS AND LIMITATIONS | AUTHOR | LICENSE AND COPYRIGHT
 script_sections = NAME | VERSION | USAGE | DESCRIPTION | OPTIONS | EXIT STATUS | CONFIGURATION | DEPENDENCIES | BUGS AND LIMITATIONS | AUTHOR | LICENSE AND COPYRIGHT
