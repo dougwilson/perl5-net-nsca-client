@@ -181,7 +181,7 @@ the server.
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::Connection> version 0.006
+This documentation refers to version 0.006
 
 =head1 SYNOPSIS
 
@@ -233,8 +233,9 @@ L</ATTRIBUTES> section).
 
 =head2 initial_packet
 
-This is a L<Net::NSCA::Client::InitialPacket> object which represents the
-initial packet received when the connection to the NSCA server was established.
+This is a L<Net::NSCA::Client::InitialPacket|Net::NSCA::Client::InitialPacket>
+object which represents the initial packet received when the connection to
+the NSCA server was established.
 
 =head2 remote_host
 
@@ -255,13 +256,14 @@ L</$DEFAULT_TIMEOUT>.
 
 =head2 transport_layer_security
 
-This is a L<Net::NSCA::Client::Connection::TLS> object that specifies the
-transport layer security that will be used when sending the data packet.
+This is a L<Net::NSCA::Client::Connection::TLS|Net::NSCA::Client::Connection::TLS>
+object that specifies the transport layer security that will be used when
+sending the data packet.
 
 =head2 socket
 
-This is the socket object (L<IO::Socket::INET>) that represents the TCP
-connection to the NSCA server.
+This is the socket object (L<IO::Socket::INET|O::Socket::INET>) that
+represents the TCP connection to the NSCA server.
 
 =head1 METHODS
 
@@ -282,14 +284,14 @@ layer security.
 =head2 send_data_packet
 
 This will send a data packet to the remote NSCA server. The method takes one
-argument which is the L<Net::NSCA::Client::DataPacket> object. If the UNIX
-timestamp of the data packet is not set to the correct timestamp the server
-is expecting, then the data packet is cloned and the correct timestamp is set
-before sending the packet.
+argument which is the L<Net::NSCA::Client::DataPacket|Net::NSCA::Client::DataPacket>
+object. If the UNIX timestamp of the data packet is not set to the correct
+timestamp the server is expecting, then the data packet is cloned and the
+correct timestamp is set before sending the packet.
 
 =head1 CONSTANTS
 
-Constants provided by this library are protected by the L<Readonly> module.
+Constants provided by this library are protected by the L<Readonly|Readonly> module.
 
 =head2 C<$DEFAULT_TIMEOUT>
 
@@ -303,19 +305,19 @@ This is the number of bytes that will be read from the socket at a time.
 
 =over
 
-=item * L<English>
+=item * L<English|English>
 
-=item * L<IO::Socket::INET>
+=item * L<IO::Socket::INET|IO::Socket::INET>
 
-=item * L<Net::NSCA::Client::InitialPacket>
+=item * L<Net::NSCA::Client::InitialPacket|Net::NSCA::Client::InitialPacket>
 
-=item * L<Moose> 0.89
+=item * L<Moose|Moose> 0.89
 
-=item * L<MooseX::StrictConstructor> 0.08
+=item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
 
-=item * L<Readonly> 1.03
+=item * L<Readonly|Readonly> 1.03
 
-=item * L<namespace::clean> 0.04
+=item * L<namespace::clean|namespace::clean> 0.04
 
 =back
 

@@ -105,8 +105,7 @@ a connection.
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::Connection::TLS> version
-0.006
+This documentation refers to version 0.006
 
 =head1 SYNOPSIS
 
@@ -195,11 +194,11 @@ B<TODO: Write this>
 
 =over
 
-=item * L<Moose> 0.89
+=item * L<Moose|Moose> 0.89
 
-=item * L<MooseX::StrictConstructor> 0.08
+=item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
 
-=item * L<namespace::clean> 0.04
+=item * L<namespace::clean|namespace::clean> 0.04
 
 =back
 

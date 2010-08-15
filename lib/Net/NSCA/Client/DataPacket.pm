@@ -273,7 +273,7 @@ Net::NSCA::Client::DataPacket - Implements data packet for the NSCA protocol
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::DataPacket> version 0.006
+This documentation refers to version 0.006
 
 =head1 SYNOPSIS
 
@@ -363,7 +363,7 @@ B<Required>
 
 This is the status of the service that will be given to Nagios. It is
 recommended to use one of the C<$STATUS_> constants provided by
-L<Net::NSCA::Client>.
+L<Net::NSCA::Client|Net::NSCA::Client>.
 
 =head2 unix_timestamp
 
@@ -382,19 +382,19 @@ representation is what will be sent over the network.
 
 =over
 
-=item * L<Convert::Binary::C> 0.74
+=item * L<Convert::Binary::C|Convert::Binary::C> 0.74
 
-=item * L<Digest::CRC>
+=item * L<Digest::CRC|Digest::CRC>
 
-=item * L<Moose> 0.89
+=item * L<Moose|Moose> 0.89
 
-=item * L<MooseX::Clone>
+=item * L<MooseX::Clone|MooseX::Clone>
 
-=item * L<MooseX::StrictConstructor> 0.08
+=item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
 
-=item * L<Readonly> 1.03
+=item * L<Readonly|Readonly> 1.03
 
-=item * L<namespace::clean> 0.04
+=item * L<namespace::clean|namespace::clean> 0.04
 
 =back
 

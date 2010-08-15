@@ -126,7 +126,7 @@ Net::NSCA::Client - Send passive checks to Nagios locally and remotely.
 
 =head1 VERSION
 
-This documnetation refers to L<Net::NSCA::Client> version 0.006
+This documentation refers to version 0.006
 
 =head1 SYNOPSIS
 
@@ -184,7 +184,8 @@ This is the password to use with the encryption.
 
 =head2 encryption_type
 
-This is a string of the encryption type. See L<Net::NSCA::Client::Connection::TLS>
+This is a string of the encryption type. See
+L<Net::NSCA::Client::Connection::TLS|Net::NSCA::Client::Connection::TLS>
 for the different encryption types.
 
 =head2 remote_host
@@ -225,7 +226,7 @@ This is the service description of the service that is being reported.
 
 =head3 message
 
-This is the message that the plug in givaes to Nagios.
+This is the message that the plug in gives to Nagios.
 
 =head3 status
 
@@ -278,7 +279,7 @@ When there is no encryption, then the packet is completely unchanged.
 
 =head4 XOR
 
-This is the obfucated method and so is no encryption. This is mearly to attempt
+This is the obfucated method and so is no encryption. This is merely to attempt
 to mask the data to make it harder to see. The packet is first XOR'd with the
 IV that was sent by the server, one byte at a time. Once all bytes from the IV
 have been used, then it starts again from the first byte of the IV. After this,
@@ -324,17 +325,17 @@ This is the status value when a service is UNKNOWN
 
 =over
 
-=item * L<Moose> 0.89
+=item * L<Moose|Moose> 0.89
 
-=item * L<MooseX::StrictConstructor> 0.08
+=item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
 
-=item * L<Net::NSCA::Client::Connection>
+=item * L<Net::NSCA::Client::Connection|Net::NSCA::Client::Connection>
 
-=item * L<Net::NSCA::Client::DataPacket>
+=item * L<Net::NSCA::Client::DataPacket|Net::NSCA::Client::DataPacket>
 
-=item * L<Readonly> 1.03
+=item * L<Readonly|Readonly> 1.03
 
-=item * L<namespace::clean> 0.04
+=item * L<namespace::clean|namespace::clean> 0.04
 
 =back
 
@@ -342,13 +343,13 @@ This is the status value when a service is UNKNOWN
 
 =over
 
-=item * L<Nagios::NSCA::Client> is a semi-new NSCA client that works, but
-contains no documentation or tests.
+=item * L<Nagios::NSCA::Client|Nagios::NSCA::Client> is a semi-new NSCA
+client that works, but contains no documentation or tests.
 
-=item * L<Net::Nsca> is one of the original NSCA Perl modules.
+=item * L<Net::Nsca|Net::Nsca> is one of the original NSCA Perl modules.
 
-=item * L<POE::Component::Client::NSCA> is a NSCA client that is made for
-L<POE>.
+=item * L<POE::Component::Client::NSCA|POE::Component::Client::NSCA> is a
+NSCA client that is made for L<the POE framework|POE>.
 
 =back
 
