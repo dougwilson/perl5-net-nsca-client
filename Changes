@@ -1,6 +1,11 @@
 Revision history for Net-NSCA-Client
 ====================================
 
+TO BE RELEASED
+  * Check for data integrety when decoding packets.
+  * Fill empty space in packets with random alpha numeric data as the
+    standard NSCA client/server does.
+
 0.006 Tue, November 3, 2009 10:56:45 -0500
   * THIS CONTAINS AN IMPORTANT FIX AND PREVIOUS VERSIONS ARE NOT
     RECOMMENDED.

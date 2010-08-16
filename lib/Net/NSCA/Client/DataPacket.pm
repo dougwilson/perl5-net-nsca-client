@@ -85,6 +85,17 @@ has unix_timestamp => (
 );
 
 ###############################################################################
+# PRIVATE ATTRIBUTES
+has _raw_packet => (
+	is  => 'ro',
+	isa => 'Str',
+	init_arg => undef,
+
+	lazy => 1,
+	builder => '_build_raw_packet',
+);
+
+###############################################################################
 # CONSTRUCTOR
 around BUILDARGS => sub {
 	my ($original_method, $class, @args) = @_;
@@ -102,6 +113,12 @@ around BUILDARGS => sub {
 ###############################################################################
 # METHODS
 sub to_string {
+	return shift->_raw_packet;
+}
+
+###############################################################################
+# PRIVATE METHODS
+sub _build_raw_packet {
 	my ($self) = @_;
 
 	# Create a HASH of the value to be provided to the pack
@@ -122,11 +139,11 @@ sub to_string {
 	# Convert::Binary::C object
 	my $packet = $packer->pack(data_packet_struct => \%pack_options);
 
-	# Calculate the CRC32 value for the packet
-	$pack_options{crc32_value} = crc32($packet);
-
 	# Repack the packet with the CRC32 value
-	$packet = $packer->pack(data_packet_struct => \%pack_options);
+	$packer->pack(data_packet_struct => {
+		# Calculate the CRC32 value for the packet
+		crc32_value => crc32($packet),
+	}, $packet);
 
 	# Return the packet
 	return $packet;
@@ -136,6 +153,10 @@ sub to_string {
 # PRIVATE FUNCTIONS
 sub _constructor_options_from_string {
 	my ($packet) = @_;
+
+	if (!_is_packet_valid($packet)) {
+		confess 'Provided packet is not valid';
+	}
 
 	# Get the packer data object
 	my $packer = _data_packet_struct();
@@ -172,15 +193,31 @@ ENDC
 
 	# Add the string hooks to all the string members
 	foreach my $string_member (qw(host_name svc_description plugin_output)) {
-		# XXX: THE RANDOMNESS OF THE STRING BREAKS CRC32
-		# XXX: $c->tag("data_packet_struct.$string_member", Hooks => {
-		# XXX: 	pack   => [\&_string_randpad_pack, $c->arg(qw(DATA SELF TYPE)), 'data_packet_struct'],
-		# XXX: 	unpack =>  \&_string_unpack,
-		# XXX: });
-		$c->tag("data_packet_struct.$string_member", Format => 'String');
+		$c->tag("data_packet_struct.$string_member", Hooks => {
+			pack   => [\&_string_randpad_pack, $c->arg(qw(DATA SELF TYPE)), 'data_packet_struct'],
+			unpack =>  \&_string_unpack,
+		});
 	}
 
 	return $c;
+}
+sub _is_packet_valid {
+	my ($packet) = @_;
+
+	# Get the packer data object
+	my $packer = _data_packet_struct();
+
+	# Extract the CRC from the packet
+	my $crc32 = $packer->unpack(data_packet_struct => $packet)->{crc32_value};
+
+	# Repack the packet with CRC32 as zero so that the CRC32 can
+	# be recalculated
+	$packer->pack(data_packet_struct => {
+		crc32_value => 0,
+	}, $packet);
+
+	# Packet is valid if the CRC32 values are the same
+	return $crc32 == crc32($packet);
 }
 sub _setup_c_object {
 	my ($c) = @_;
@@ -253,10 +290,10 @@ sub _string_randpad_pack {
 	return [unpack 'c*', $string];
 }
 sub _string_unpack {
-	my ($c_string_struct) = @_;
+	my ($c_string) = @_;
 
 	# Return the Perl string
-	return pack 'Z*', @{$c_string_struct->{buf}};
+	return unpack 'Z*', pack 'c*', map { defined $_ ? $_ : 0 } @{$c_string};
 }
 
 ###############################################################################
