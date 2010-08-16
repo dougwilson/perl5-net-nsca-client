@@ -154,12 +154,12 @@ sub _build_raw_packet {
 sub _constructor_options_from_string {
 	my ($packet) = @_;
 
-	if (!_is_packet_valid($packet)) {
-		confess 'Provided packet is not valid';
-	}
-
 	# Get the packer data object
 	my $packer = _data_packet_struct();
+
+	if (!_is_packet_valid($packet, $packer)) {
+		confess 'Provided packet is not valid';
+	}
 
 	# Unpack the data packet
 	my $unpacket = $packer->unpack(data_packet_struct => $packet);
@@ -202,10 +202,10 @@ ENDC
 	return $c;
 }
 sub _is_packet_valid {
-	my ($packet) = @_;
+	my ($packet, $packer) = @_;
 
 	# Get the packer data object
-	my $packer = _data_packet_struct();
+	$packer ||= _data_packet_struct();
 
 	# Extract the CRC from the packet
 	my $crc32 = $packer->unpack(data_packet_struct => $packet)->{crc32_value};
