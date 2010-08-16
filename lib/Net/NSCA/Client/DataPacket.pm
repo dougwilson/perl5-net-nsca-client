@@ -248,10 +248,15 @@ sub _setup_c_object {
 	}
 
 	# Now that the sizes are known, set up various typedefs
-	$c->parse(sprintf 'typedef %s int16_t;'           , $int_sizes{$BYTES_FOR_16BITS});
-	$c->parse(sprintf 'typedef unsigned %s u_int16_t;', $int_sizes{$BYTES_FOR_16BITS});
-	$c->parse(sprintf 'typedef %s int32_t;'           , $int_sizes{$BYTES_FOR_32BITS});
-	$c->parse(sprintf 'typedef unsigned %s u_int32_t;', $int_sizes{$BYTES_FOR_32BITS});
+	my @typedefs = (
+		sprintf('typedef %s int16_t;'           , $int_sizes{$BYTES_FOR_16BITS}),
+		sprintf('typedef unsigned %s u_int16_t;', $int_sizes{$BYTES_FOR_16BITS}),
+		sprintf('typedef %s int32_t;'           , $int_sizes{$BYTES_FOR_32BITS}),
+		sprintf('typedef unsigned %s u_int32_t;', $int_sizes{$BYTES_FOR_32BITS}),
+	);
+
+	# Have the C object parse the typedefs
+	$c->parse(join qq{\n}, @typedefs);
 
 	# Return the object
 	return $c;
