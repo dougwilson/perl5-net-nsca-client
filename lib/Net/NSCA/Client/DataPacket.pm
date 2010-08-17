@@ -36,8 +36,8 @@ Readonly our $MAX_SERVICE_MESSAGE_LENGTH     => 512;
 
 ###############################################################################
 # OVERLOADED FUNCTIONS
-__PACKAGE__->meta->add_package_symbol(q{&()}  => sub {                  });
-__PACKAGE__->meta->add_package_symbol(q{&(""} => sub { shift->to_string });
+__PACKAGE__->meta->add_package_symbol(q{&()}  => sub {                   });
+__PACKAGE__->meta->add_package_symbol(q{&(""} => sub { shift->raw_packet });
 
 ###############################################################################
 # PRIVATE CONSTANTS
@@ -58,6 +58,13 @@ has packet_version => (
 
 	default       => 3,
 	documentation => q{The version of the packet being transmitted},
+);
+has raw_packet => (
+	is  => 'ro',
+	isa => 'Str',
+
+	lazy    => 1,
+	builder => '_build_raw_packet',
 );
 has service_description => (
 	is  => 'ro',
@@ -85,17 +92,6 @@ has unix_timestamp => (
 );
 
 ###############################################################################
-# PRIVATE ATTRIBUTES
-has _raw_packet => (
-	is  => 'ro',
-	isa => 'Str',
-	init_arg => undef,
-
-	lazy => 1,
-	builder => '_build_raw_packet',
-);
-
-###############################################################################
 # CONSTRUCTOR
 around BUILDARGS => sub {
 	my ($original_method, $class, @args) = @_;
@@ -103,17 +99,24 @@ around BUILDARGS => sub {
 	if (@args == 1 && !ref $args[0]) {
 		# This should be the packet as a string, so get the new
 		# args from this string
-		@args = _constructor_options_from_string($args[0]);
+		@args = (raw_packet => $args[0]);
 	}
 
-	# Call the original method
-	return $class->$original_method(@args);
+	# Call the original method to get args HASHREF
+	my $args = $class->$original_method(@args);
+
+	if (exists $args->{raw_packet}) {
+		# The packet was provided to the constructor
+		$args = {%{$args}, _constructor_options_from_string($args->{raw_packet})};
+	}
+
+	return $args;
 };
 
 ###############################################################################
 # METHODS
 sub to_string {
-	return shift->_raw_packet;
+	return shift->raw_packet;
 }
 
 ###############################################################################
@@ -332,7 +335,9 @@ This documentation refers to version 0.006
   );
 
   # Create a packet recieved from over the network
-  my $recieved_packet = Net::NSCA::Client::DataPacket->new($recieved_data);
+  my $recieved_packet = Net::NSCA::Client::DataPacket->new(
+      raw_packet => $recieved_data,
+  );
 
 =head1 DESCRIPTION
 
@@ -379,6 +384,12 @@ B<Required>
 
 This is the host name of the host as listed in Nagios that the service
 belongs to.
+
+=head2 raw_packet
+
+This is the raw packet to send over the network. Providing this packet to
+the constructor will automatically populate all other attributes and so
+they are B<not> required if this attribute is provided.
 
 =head2 packet_version
 
