@@ -13,11 +13,12 @@ MANIFEST			This list of files
 META.yml
 README
 t/00-load.t
+t/live_server.t
 t/run.t
 t/send_nsca.t
-t/tests/Test/Net/NSCA/Client.pm
-t/tests/Test/Net/NSCA/Client/DataPacket.pm
-t/tests/Test/Net/NSCA/Client/InitialPacket.pm
+t/tests/MyTest/Net/NSCA/Client.pm
+t/tests/MyTest/Net/NSCA/Client/DataPacket.pm
+t/tests/MyTest/Net/NSCA/Client/InitialPacket.pm
 xt/clean-namespaces.t
 xt/consistent-version.t
 xt/critic-scripts.t

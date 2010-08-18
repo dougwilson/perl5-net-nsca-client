@@ -1,4 +1,4 @@
-package Test::Net::NSCA::Client::InitialPacket;
+package MyTest::Net::NSCA::Client::InitialPacket;
 
 use strict;
 use warnings 'all';
