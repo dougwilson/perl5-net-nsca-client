@@ -24,6 +24,12 @@ use Readonly 1.03;
 use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
+# OVERLOADED FUNCTIONS
+__PACKAGE__->meta->add_package_symbol(q{&()}    => sub { });
+__PACKAGE__->meta->add_package_symbol(q{&("=="} => sub {  $_[0]->is_compatible_with });
+__PACKAGE__->meta->add_package_symbol(q{&("!="} => sub { !$_[0]->is_compatible_with });
+
+###############################################################################
 # PRIVATE CONSTANTS
 Readonly my $BYTES_FOR_16BITS => 2;
 Readonly my $BYTES_FOR_32BITS => 4;
@@ -68,6 +74,17 @@ has _c_packer => (
 
 ###############################################################################
 # METHODS
+sub is_compatible_with {
+	my ($self, $server_config) = @_;
+
+	# Compatible if all attributes are equal
+	return $server_config->isa(ref $self)
+	    && $self->initialization_vector_length == $server_config->initialization_vector_length
+	    && $self->max_description_length       == $server_config->max_description_length
+	    && $self->max_hostname_length          == $server_config->max_hostname_length
+	    && $self->max_service_message_length   == $server_config->max_service_message_length
+	;
+}
 sub pack_data_packet {
 	my ($self, $args) = @_;
 
@@ -398,6 +415,13 @@ This specifies the maximum service message (plugin output) length in bytes
 as specified in the C<MAX_PLUGINOUTPUT_LENGTH> constant in F<common.h>.
 
 =head1 METHODS
+
+=head2 is_compatible_with
+
+This takes another L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig>
+instance and returns a Boolean specifying if the two server configurations
+are compatible with each other. This method is also accessible through an
+overloaded C<==> and C<!=>.
 
 =head2 pack_data_packet
 

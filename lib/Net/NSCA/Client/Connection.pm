@@ -99,6 +99,12 @@ sub restart {
 sub send_data_packet {
 	my ($self, $data_packet) = @_;
 
+	if ($self->server_config != $data_packet->server_config) {
+		# The server's configuration for the packet does not match the connection
+		confess sprintf 'Unable to send data packet over connection: %s',
+			'Data packet server configuration does not match connection server configration';
+	}
+
 	if ($data_packet->unix_timestamp != $self->initial_packet->unix_timestamp) {
 		# The timestamp of the pack is incorrect. Repackage the data packet
 		# to the correct timestamp.
