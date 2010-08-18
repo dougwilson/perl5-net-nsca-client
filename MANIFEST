@@ -16,6 +16,7 @@ t/00-load.t
 t/live_server.t
 t/run.t
 t/send_nsca.t
+t/tests/MyTest/Class.pm
 t/tests/MyTest/Net/NSCA/Client.pm
 t/tests/MyTest/Net/NSCA/Client/DataPacket.pm
 t/tests/MyTest/Net/NSCA/Client/InitialPacket.pm

@@ -6,23 +6,7 @@ use warnings 'all';
 use Test::Exception 0.03;
 use Test::More 0.18;
 
-use base 'Test::Class';
-
-sub class { 'Net::NSCA::Client::InitialPacket' }
-
-sub startup : Tests(startup) {
-	my ($test) = @_;
-
-	# Get the name of the class we are testing
-	my $class = $test->class;
-
-	# Load the class to test
-	eval "use $class";
-
-	die $@ if $@;
-
-	return;
-}
+use base 'MyTest::Class';
 
 sub constructor_new : Tests(4) {
 	my ($test) = @_;
