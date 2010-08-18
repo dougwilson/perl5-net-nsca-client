@@ -23,6 +23,7 @@ use Net::NSCA::Client::Library qw(Hostname PortNumber Timeout);
 use Net::NSCA::Client::Connection;
 use Net::NSCA::Client::Connection::TLS;
 use Net::NSCA::Client::DataPacket;
+use Net::NSCA::Client::ServerConfig ();
 use Readonly 1.03;
 
 ###############################################################################
@@ -66,6 +67,12 @@ has remote_port => (
 
 	default => $DEFAULT_PORT,
 );
+has server_config => (
+	is  => 'ro',
+	isa => 'Net::NSCA::Client::ServerConfig',
+
+	default => sub { Net::NSCA::Client::ServerConfig->new },
+);
 has timeout => (
 	is  => 'rw',
 	isa => Timeout,
@@ -84,9 +91,10 @@ sub send_report {
 
 	# Create a new connection to the remote server
 	my $connection = Net::NSCA::Client::Connection->new(
-		remote_host => $self->remote_host,
-		remote_port => $self->remote_port,
-		timeout     => $self->timeout,
+		remote_host   => $self->remote_host,
+		remote_port   => $self->remote_port,
+		server_config => $self->server_config,
+		timeout       => $self->timeout,
 
 		($self->encryption_type eq 'none' ? () : (
 			transport_layer_security => Net::NSCA::Client::Connection::TLS->new(
@@ -103,6 +111,7 @@ sub send_report {
 		service_description => $service,
 		service_message     => $message,
 		service_status      => $status,
+		server_config       => $self->server_config,
 	);
 
 	# Send back the data packet
@@ -195,6 +204,13 @@ This is the remote host to connect to. This will default to L</$DEFAULT_HOST>.
 =head2 remote_port
 
 This is the remote port to connect to. This will default to L</$DEFAULT_PORT>.
+
+=head2 server_config
+
+This specifies the configuration of the remote NSCA server. See
+L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig> for details
+about using this. Typically this does not need to be specified unless the
+NSCA server was compiled with customizations.
 
 =head2 timeout
 
@@ -332,6 +348,8 @@ This is the status value when a service is UNKNOWN
 =item * L<Net::NSCA::Client::Connection|Net::NSCA::Client::Connection>
 
 =item * L<Net::NSCA::Client::DataPacket|Net::NSCA::Client::DataPacket>
+
+=item * L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig>
 
 =item * L<Readonly|Readonly> 1.03
 

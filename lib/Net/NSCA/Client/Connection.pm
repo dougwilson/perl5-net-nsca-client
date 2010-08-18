@@ -23,6 +23,7 @@ use Net::NSCA::Client::Library qw(Hostname PortNumber Timeout);
 use English qw(-no_match_vars);
 use IO::Socket::INET;
 use Net::NSCA::Client::InitialPacket;
+use Net::NSCA::Client::ServerConfig ();
 use Readonly 1.03;
 
 ###############################################################################
@@ -55,6 +56,12 @@ has remote_port => (
 	isa => PortNumber,
 
 	required => 1,
+);
+has server_config => (
+	is  => 'ro',
+	isa => 'Net::NSCA::Client::ServerConfig',
+
+	default => sub { Net::NSCA::Client::ServerConfig->new },
 );
 has timeout => (
 	is  => 'rw',
@@ -101,7 +108,7 @@ sub send_data_packet {
 	}
 
 	# Get the byte representation of the packet
-	my $byte_packet = $data_packet->to_string;
+	my $byte_packet = $data_packet->raw_packet;
 
 	if ($self->has_transport_layer_security) {
 		# Encrypt the data packet
@@ -136,10 +143,13 @@ sub _build_initial_packet {
 	# Read the bytes
 	## no critic (Subroutines::ProtectPrivateSubs)
 	$self->socket->sysread($received_bytes,
-		Net::NSCA::Client::InitialPacket::_init_packet_struct()->sizeof('init_packet_struct'));
+		$self->server_config->_c_packer->sizeof('init_packet_struct'));
 
 	# Create the initial packet object
-	my $initial_packet = Net::NSCA::Client::InitialPacket->new($received_bytes);
+	my $initial_packet = Net::NSCA::Client::InitialPacket->new(
+		raw_packet    => $received_bytes,
+		server_config => $self->server_config,
+	);
 
 	# Return the initial packet
 	return $initial_packet;
@@ -249,6 +259,13 @@ B<Required>
 
 This is the port number of the remote NSCA server.
 
+=head2 server_config
+
+This specifies the configuration of the remote NSCA server. See
+L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig> for details
+about using this. Typically this does not need to be specified unless the
+NSCA server was compiled with customizations.
+
 =head2 timeout
 
 This is the timeout for reading from the socket. The default is set to
@@ -310,6 +327,8 @@ This is the number of bytes that will be read from the socket at a time.
 =item * L<IO::Socket::INET|IO::Socket::INET>
 
 =item * L<Net::NSCA::Client::InitialPacket|Net::NSCA::Client::InitialPacket>
+
+=item * L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig>
 
 =item * L<Moose|Moose> 0.89
 

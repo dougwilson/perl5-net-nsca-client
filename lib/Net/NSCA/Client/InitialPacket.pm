@@ -20,8 +20,8 @@ use Net::NSCA::Client::Library qw(InitializationVector);
 
 ###############################################################################
 # MODULES
-use Convert::Binary::C 0.74;
 use Data::Rand::Obscure 0.020;
+use Net::NSCA::Client::ServerConfig ();
 use Readonly 1.03;
 
 ###############################################################################
@@ -30,12 +30,8 @@ use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
 # OVERLOADED FUNCTIONS
-__PACKAGE__->meta->add_package_symbol(q{&()}  => sub {                  });
-__PACKAGE__->meta->add_package_symbol(q{&(""} => sub { shift->to_string });
-
-###############################################################################
-# CONSTANTS
-Readonly our $INITIALIZATION_VECTOR_LENGTH => 128;
+__PACKAGE__->meta->add_package_symbol(q{&()}  => sub {                   });
+__PACKAGE__->meta->add_package_symbol(q{&(""} => sub { shift->raw_packet });
 
 ###############################################################################
 # PRIVATE CONSTANTS
@@ -50,6 +46,19 @@ has initialization_vector => (
 
 	builder => '_build_initialization_vector',
 	coerce  => 1,
+);
+has raw_packet => (
+	is  => 'ro',
+	isa => 'Str',
+
+	lazy    => 1,
+	builder => '_build_raw_packet',
+);
+has server_config => (
+	is  => 'ro',
+	isa => 'Net::NSCA::Client::ServerConfig',
+
+	default => sub { Net::NSCA::Client::ServerConfig->new },
 );
 has unix_timestamp => (
 	is  => 'ro',
@@ -66,33 +75,27 @@ around BUILDARGS => sub {
 	if (@args == 1 && !ref $args[0]) {
 		# This should be the packet as a string, so get the new
 		# args from this string
-		@args = _constructor_options_from_string($args[0]);
+		@args = (raw_packet => $args[0]);
 	}
 
-	# Call the original method
-	return $class->$original_method(@args);
+	# Call the original method to get args HASHREF
+	my $args = $class->$original_method(@args);
+
+	if (exists $args->{raw_packet}) {
+		# The packet was provided to the constructor
+		$args = {
+			%{$args}, # Given arguments
+			_constructor_options_from_string($args->{raw_packet}, $args->{server_config})
+		};
+	}
+
+	return $args;
 };
 
 ###############################################################################
 # METHODS
 sub to_string {
-	my ($self) = @_;
-
-	# Create a HASH of the value to be provided to the pack
-	my %pack_options = (
-		iv        => $self->initialization_vector,
-		timestamp => $self->unix_timestamp,
-	);
-
-	# Get the packer data object
-	my $packer = _init_packet_struct();
-
-	# To construct the packet, we will use the pack method from the
-	# Convert::Binary::C object
-	my $packet = $packer->pack(init_packet_struct => \%pack_options);
-
-	# Return the packet
-	return $packet;
+	return shift->raw_packet;
 }
 
 ###############################################################################
@@ -101,80 +104,49 @@ sub _build_initialization_vector {
 	my ($self) = @_;
 
 	return Data::Rand::Obscure::create_bin(
-		length => $INITIALIZATION_VECTOR_LENGTH,
+		length => $self->server_config->initialization_vector_length,
 	);
+}
+sub _build_raw_packet {
+	my ($self) = @_;
+
+	# Create a HASH of the value to be provided to the pack
+	my %pack_options = (
+		iv        => $self->initialization_vector,
+		timestamp => $self->unix_timestamp,
+	);
+
+	# To construct the packet, we will use the pack method from the
+	# Convert::Binary::C object
+	my $packet = $self->server_config->pack_initial_packet(\%pack_options);
+
+	# Return the packet
+	return $packet;
 }
 
 ###############################################################################
 # PRIVATE FUNCTIONS
 sub _constructor_options_from_string {
-	my ($packet) = @_;
+	my ($packet, $server_config) = @_;
 
-	# Get the packer data object
-	my $packer = _init_packet_struct();
+	if (!defined $server_config) {
+		# Get the attribute from the class
+		my $attr = __PACKAGE__->meta->find_attribute_by_name('server_config');
+
+		# Set to the class default
+		$server_config = $attr->is_default_a_coderef ? $attr->default->()
+		                                             : $attr->default
+		                                             ;
+	}
 
 	# Unpack the data packet
-	my $unpacket = $packer->unpack(init_packet_struct => $packet);
+	my $unpacket = $server_config->unpack_initial_packet($packet);
 
 	# Return the options for the constructor
 	return (
 		initialization_vector => $unpacket->{iv       },
 		unix_timestamp        => $unpacket->{timestamp},
 	);
-}
-sub _init_packet_struct {
-	# Create a C object
-	my $c = _setup_c_object();
-
-	# Add the init_packet_struct structure
-	$c->parse(<<"ENDC");
-		struct init_packet_struct {
-			char      iv[$INITIALIZATION_VECTOR_LENGTH];
-			u_int32_t timestamp;
-		};
-ENDC
-
-	# Tag the IV as a binary string
-	$c->tag('init_packet_struct.iv', Format => 'Binary');
-
-	return $c;
-}
-sub _setup_c_object {
-	my ($c) = @_;
-
-	# If no object provided, create a new one
-	$c ||= Convert::Binary::C->new;
-
-	# Set the memory structure to store in network order
-	$c->ByteOrder('BigEndian');
-
-	# The alignment always seems to be 4 bytes, so set the alignment here
-	$c->Alignment($BYTES_FOR_32BITS);
-
-	# Create a HASH of sizes to types
-	my %int_sizes;
-
-	$int_sizes{$c->sizeof('int'          )} = 'int';
-	$int_sizes{$c->sizeof('long int'     )} = 'long int';
-	$int_sizes{$c->sizeof('long long int')} = 'long long int';
-	$int_sizes{$c->sizeof('short int'    )} = 'short int';
-
-	# Check the needed types are present
-	if (!exists $int_sizes{$BYTES_FOR_16BITS}) {
-		confess 'Your platform does not have any C data type that is 16 bits';
-	}
-	if (!exists $int_sizes{$BYTES_FOR_32BITS}) {
-		confess 'Your platform does not have any C data type that is 32 bits';
-	}
-
-	# Now that the sizes are known, set up various typedefs
-	$c->parse(sprintf 'typedef %s int16_t;'           , $int_sizes{$BYTES_FOR_16BITS});
-	$c->parse(sprintf 'typedef unsigned %s u_int16_t;', $int_sizes{$BYTES_FOR_16BITS});
-	$c->parse(sprintf 'typedef %s int32_t;'           , $int_sizes{$BYTES_FOR_32BITS});
-	$c->parse(sprintf 'typedef unsigned %s u_int32_t;', $int_sizes{$BYTES_FOR_32BITS});
-
-	# Return the object
-	return $c;
 }
 
 ###############################################################################
@@ -253,6 +225,13 @@ L</$INITIALIZATION_VECTOR_LENGTH>. If a string less than this length is
 provided, then it is automatically padded with NULLs. If not specified, this
 will default to random bytes generated by a L<Crypt::Random|Crypt::Random>.
 
+=head2 server_config
+
+This specifies the configuration of the remote NSCA server. See
+L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig> for details
+about using this. Typically this does not need to be specified unless the
+NSCA server was compiled with customizations.
+
 =head2 unix_timestamp
 
 This is a UNIX timestamp, which is an integer specifying the number of
@@ -266,26 +245,17 @@ to the current timestamp, provided by C<time()>.
 This methods returns the string representation of the initial packet. This
 string representation is what will be sent over the network.
 
-=head1 CONSTANTS
-
-Constants provided by this library are protected by the L<Readonly|Readonly>
-module.
-
-=head2 C<$INITIALIZATION_VECTOR_LENGTH>
-
-This is the length of the L</initialization_vector>.
-
 =head1 DEPENDENCIES
 
 =over
-
-=item * L<Convert::Binary::C|Convert::Binary::C> 0.74
 
 =item * L<Data::Rand::Obscure|Data::Rand::Obscure> 0.020
 
 =item * L<Moose|Moose> 0.89
 
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
+
+=item * L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig>
 
 =item * L<Readonly|Readonly> 1.03
 

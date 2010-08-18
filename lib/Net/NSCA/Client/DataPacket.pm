@@ -20,8 +20,8 @@ with 'MooseX::Clone';
 
 ###############################################################################
 # MODULES
-use Convert::Binary::C 0.74;
 use Digest::CRC qw(crc32);
+use Net::NSCA::Client::ServerConfig ();
 use Readonly 1.03;
 
 ###############################################################################
@@ -66,6 +66,13 @@ has raw_packet => (
 	lazy    => 1,
 	builder => '_build_raw_packet',
 );
+has server_config => (
+	is  => 'ro',
+	isa => 'Net::NSCA::Client::ServerConfig',
+
+	default => sub { Net::NSCA::Client::ServerConfig->new },
+	traits  => [qw(Clone)],
+);
 has service_description => (
 	is  => 'ro',
 	isa => 'Str',
@@ -107,7 +114,10 @@ around BUILDARGS => sub {
 
 	if (exists $args->{raw_packet}) {
 		# The packet was provided to the constructor
-		$args = {%{$args}, _constructor_options_from_string($args->{raw_packet})};
+		$args = {
+			%{$args}, # Given arguments
+			_constructor_options_from_string($args->{raw_packet}, $args->{server_config})
+		};
 	}
 
 	return $args;
@@ -135,18 +145,15 @@ sub _build_raw_packet {
 		svc_description => $self->service_description,
 	);
 
-	# Get the packer data object
-	my $packer = _data_packet_struct();
-
 	# To construct the packet, we will use the pack method from the
 	# Convert::Binary::C object
-	my $packet = $packer->pack(data_packet_struct => \%pack_options);
+	my $packet = $self->server_config->pack_data_packet(\%pack_options);
 
 	# Repack the packet with the CRC32 value
-	$packer->pack(data_packet_struct => {
+	$self->server_config->repack_data_packet(\$packet, {
 		# Calculate the CRC32 value for the packet
 		crc32_value => crc32($packet),
-	}, $packet);
+	});
 
 	# Return the packet
 	return $packet;
@@ -155,17 +162,24 @@ sub _build_raw_packet {
 ###############################################################################
 # PRIVATE FUNCTIONS
 sub _constructor_options_from_string {
-	my ($packet) = @_;
+	my ($packet, $server_config) = @_;
 
-	# Get the packer data object
-	my $packer = _data_packet_struct();
+	if (!defined $server_config) {
+		# Get the attribute from the class
+		my $attr = __PACKAGE__->meta->find_attribute_by_name('server_config');
 
-	if (!_is_packet_valid($packet, $packer)) {
+		# Set to the class default
+		$server_config = $attr->is_default_a_coderef ? $attr->default->()
+		                                             : $attr->default
+		                                             ;
+	}
+
+	if (!_is_packet_valid($packet, $server_config)) {
 		confess 'Provided packet is not valid';
 	}
 
 	# Unpack the data packet
-	my $unpacket = $packer->unpack(data_packet_struct => $packet);
+	my $unpacket = $server_config->unpack_data_packet($packet);
 
 	# Return the options for the constructor
 	return (
@@ -177,131 +191,20 @@ sub _constructor_options_from_string {
 		unix_timestamp      => $unpacket->{timestamp      },
 	);
 }
-sub _data_packet_struct {
-	# Create a C object
-	my $c = _setup_c_object();
-
-	# Add the data_packet_struct structure
-	$c->parse(<<"ENDC");
-		struct data_packet_struct {
-			int16_t   packet_version;
-			u_int32_t crc32_value;
-			u_int32_t timestamp;
-			int16_t   return_code;
-			char      host_name[$MAX_HOSTNAME_LENGTH];
-			char      svc_description[$MAX_SERVICE_DESCRIPTION_LENGTH];
-			char      plugin_output[$MAX_SERVICE_MESSAGE_LENGTH];
-		};
-ENDC
-
-	# Add the string hooks to all the string members
-	foreach my $string_member (qw(host_name svc_description plugin_output)) {
-		$c->tag("data_packet_struct.$string_member", Hooks => {
-			pack   => [\&_string_randpad_pack, $c->arg(qw(DATA SELF TYPE)), 'data_packet_struct'],
-			unpack =>  \&_string_unpack,
-		});
-	}
-
-	return $c;
-}
 sub _is_packet_valid {
-	my ($packet, $packer) = @_;
-
-	# Get the packer data object
-	$packer ||= _data_packet_struct();
+	my ($packet, $server_config) = @_;
 
 	# Extract the CRC from the packet
-	my $crc32 = $packer->unpack(data_packet_struct => $packet)->{crc32_value};
+	my $crc32 = $server_config->unpack_data_packet($packet)->{crc32_value};
 
 	# Repack the packet with CRC32 as zero so that the CRC32 can
 	# be recalculated
-	$packer->pack(data_packet_struct => {
+	$server_config->repack_data_packet(\$packet, {
 		crc32_value => 0,
-	}, $packet);
+	});
 
 	# Packet is valid if the CRC32 values are the same
 	return $crc32 == crc32($packet);
-}
-sub _setup_c_object {
-	my ($c) = @_;
-
-	# If no object provided, create a new one
-	$c ||= Convert::Binary::C->new;
-
-	# Set the memory structure to store in network order
-	$c->ByteOrder('BigEndian');
-
-	# The alignment always seems to be 4 bytes, so set the alignment here
-	$c->Alignment($BYTES_FOR_32BITS);
-
-	# Create a HASH of sizes to types
-	my %int_sizes;
-
-	$int_sizes{$c->sizeof('int'          )} = 'int';
-	$int_sizes{$c->sizeof('long int'     )} = 'long int';
-	$int_sizes{$c->sizeof('long long int')} = 'long long int';
-	$int_sizes{$c->sizeof('short int'    )} = 'short int';
-
-	# Check the needed types are present
-	if (!exists $int_sizes{$BYTES_FOR_16BITS}) {
-		confess 'Your platform does not have any C data type that is 16 bits';
-	}
-	if (!exists $int_sizes{$BYTES_FOR_32BITS}) {
-		confess 'Your platform does not have any C data type that is 32 bits';
-	}
-
-	# Now that the sizes are known, set up various typedefs
-	my @typedefs = (
-		sprintf('typedef %s int16_t;'           , $int_sizes{$BYTES_FOR_16BITS}),
-		sprintf('typedef unsigned %s u_int16_t;', $int_sizes{$BYTES_FOR_16BITS}),
-		sprintf('typedef %s int32_t;'           , $int_sizes{$BYTES_FOR_32BITS}),
-		sprintf('typedef unsigned %s u_int32_t;', $int_sizes{$BYTES_FOR_32BITS}),
-	);
-
-	# Have the C object parse the typedefs
-	$c->parse(join qq{\n}, @typedefs);
-
-	# Return the object
-	return $c;
-}
-sub _string_randpad_pack {
-	my ($string, $c, $type, $struct) = @_;
-
-	if (defined $struct) {
-		$type = sprintf '%s.%s', $struct, $type;
-	}
-
-	# Cut off the NULL and anything after it
-	($string) = $string =~ m{\A ([^\0]+)}msx;
-
-	# Add NULL to the end of the string
-	$string .= chr 0;
-
-	# Get the max length
-	my $max_length = $c->sizeof($type);
-
-	# Check if the string is too long
-	if ($max_length < length $string) {
-		confess sprintf 'The string provided to %s is too long. Max length is %s bytes',
-			$type, $max_length - 1;
-	}
-
-	# Create an array of letters and numbers
-	my @letters_and_numbers = ('a'..'z', 'A'..'Z', '0'..'9');
-
-	# Pad the remaining space with random ASCII characters
-	while ($max_length > length $string) {
-		$string .= $letters_and_numbers[int rand @letters_and_numbers];
-	}
-
-	# Return the string
-	return [unpack 'c*', $string];
-}
-sub _string_unpack {
-	my ($c_string) = @_;
-
-	# Return the Perl string
-	return unpack 'Z*', pack 'c*', map { defined $_ ? $_ : 0 } @{$c_string};
 }
 
 ###############################################################################
@@ -385,17 +288,17 @@ B<Required>
 This is the host name of the host as listed in Nagios that the service
 belongs to.
 
-=head2 raw_packet
-
-This is the raw packet to send over the network. Providing this packet to
-the constructor will automatically populate all other attributes and so
-they are B<not> required if this attribute is provided.
-
 =head2 packet_version
 
 This is the version of the packet to be sent. A few different NSCA servers use
 slightly different version numbers, but the rest of the packet is the same.
 If not specified, this will default to 3.
+
+=head2 raw_packet
+
+This is the raw packet to send over the network. Providing this packet to
+the constructor will automatically populate all other attributes and so
+they are B<not> required if this attribute is provided.
 
 =head2 service_description
 
@@ -418,6 +321,13 @@ This is the status of the service that will be given to Nagios. It is
 recommended to use one of the C<$STATUS_> constants provided by
 L<Net::NSCA::Client|Net::NSCA::Client>.
 
+=head2 server_config
+
+This specifies the configuration of the remote NSCA server. See
+L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig> for details
+about using this. Typically this does not need to be specified unless the
+NSCA server was compiled with customizations.
+
 =head2 unix_timestamp
 
 This is a UNIX timestamp, which is an integer specifying the number of
@@ -435,8 +345,6 @@ representation is what will be sent over the network.
 
 =over
 
-=item * L<Convert::Binary::C|Convert::Binary::C> 0.74
-
 =item * L<Digest::CRC|Digest::CRC>
 
 =item * L<Moose|Moose> 0.89
@@ -444,6 +352,8 @@ representation is what will be sent over the network.
 =item * L<MooseX::Clone|MooseX::Clone>
 
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
+
+=item * L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig>
 
 =item * L<Readonly|Readonly> 1.03
 
