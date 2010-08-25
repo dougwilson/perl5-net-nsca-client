@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 ###############################################################################
 # MOOSE
@@ -326,7 +326,7 @@ NSCA server
 
 =head1 VERSION
 
-This documentation refers to version 0.006
+This documentation refers to version 0.007
 
 =head1 SYNOPSIS
 
@@ -425,13 +425,13 @@ overloaded C<==> and C<!=>.
 
 =head2 pack_data_packet
 
-This takes a HASHREF that specity the members of the C structure and the
+This takes a HASHREF that specify the members of the C structure and the
 values to pack in each member. This will return a string that is the raw
 packed byte data.
 
 =head2 pack_initial_packet
 
-This takes a HASHREF that specity the members of the C structure and the
+This takes a HASHREF that specify the members of the C structure and the
 values to pack in each member. This will return a string that is the raw
 packed byte data.
 

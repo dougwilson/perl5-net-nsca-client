@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 ###############################################################################
 # MOOSE
@@ -164,7 +164,7 @@ protocol
 
 =head1 VERSION
 
-This documentation refers to version 0.006
+This documentation refers to version 0.007
 
 =head1 SYNOPSIS
 
