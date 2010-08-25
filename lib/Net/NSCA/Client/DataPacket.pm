@@ -20,7 +20,7 @@ with 'MooseX::Clone';
 
 ###############################################################################
 # MODULES
-use Digest::CRC qw(crc32);
+use Digest::CRC ();
 use Net::NSCA::Client::ServerConfig ();
 use Readonly 1.03;
 
@@ -152,7 +152,7 @@ sub _build_raw_packet {
 	# Repack the packet with the CRC32 value
 	$self->server_config->repack_data_packet(\$packet, {
 		# Calculate the CRC32 value for the packet
-		crc32_value => crc32($packet),
+		crc32_value => Digest::CRC::crc32($packet),
 	});
 
 	# Return the packet
@@ -204,7 +204,7 @@ sub _is_packet_valid {
 	});
 
 	# Packet is valid if the CRC32 values are the same
-	return $crc32 == crc32($packet);
+	return $crc32 == Digest::CRC::crc32($packet);
 }
 
 ###############################################################################
