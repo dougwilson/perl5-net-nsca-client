@@ -251,10 +251,10 @@ sub _setup_c_object {
 
 	# Check the needed types are present
 	if (!exists $int_sizes{$BYTES_FOR_16BITS}) {
-		confess 'Your platform does not have any C data type that is 16 bits';
+		Moose->throw_error('Your platform does not have any C data type that is 16 bits');
 	}
 	if (!exists $int_sizes{$BYTES_FOR_32BITS}) {
-		confess 'Your platform does not have any C data type that is 32 bits';
+		Moose->throw_error('Your platform does not have any C data type that is 32 bits');
 	}
 
 	# Now that the sizes are known, set up various typedefs
@@ -289,8 +289,8 @@ sub _string_randpad_pack {
 
 	# Check if the string is too long
 	if ($max_length < length $string) {
-		confess sprintf 'The string provided to %s is too long. Max length is %s bytes',
-			$type, $max_length - 1;
+		Moose->throw_error(sprintf 'The string provided to %s is too long. Max length is %s bytes',
+			$type, $max_length - 1);
 	}
 
 	# Create an array of letters and numbers

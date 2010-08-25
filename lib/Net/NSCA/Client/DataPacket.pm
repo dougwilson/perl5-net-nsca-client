@@ -175,7 +175,7 @@ sub _constructor_options_from_string {
 	}
 
 	if (!_is_packet_valid($packet, $server_config)) {
-		confess 'Provided packet is not valid';
+		Moose->throw_error('Provided packet is not valid');
 	}
 
 	# Unpack the data packet

@@ -101,8 +101,8 @@ sub send_data_packet {
 
 	if ($self->server_config != $data_packet->server_config) {
 		# The server's configuration for the packet does not match the connection
-		confess sprintf 'Unable to send data packet over connection: %s',
-			'Data packet server configuration does not match connection server configration';
+		Moose->throw_error(sprintf 'Unable to send data packet over connection: %s',
+			'Data packet server configuration does not match connection server configration');
 	}
 
 	if ($data_packet->unix_timestamp != $self->initial_packet->unix_timestamp) {
@@ -127,8 +127,8 @@ sub send_data_packet {
 	# Send the data packet over the socket
 	if (!defined $self->socket->syswrite($byte_packet)) {
 		# An error occurred during transmission
-		confess sprintf 'An error occurred during data packet transmission: %s',
-			$ERRNO;
+		Moose->throw_error(sprintf 'An error occurred during data packet transmission: %s',
+			$ERRNO);
 	}
 
 	# Reset the connection after a successful write
@@ -174,8 +174,8 @@ sub _build_socket {
 
 	if (!defined $socket) {
 		# The socket failed to be created
-		confess sprintf 'Creating a new socket resulted in %s',
-			$ERRNO;
+		Moose->throw_error(sprintf 'Creating a new socket resulted in %s',
+			$ERRNO);
 	}
 
 	# Return the socket

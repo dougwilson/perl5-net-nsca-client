@@ -15,10 +15,6 @@ use Moose 0.89;
 use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
-# MODULES
-use English qw(-no_match_vars);
-
-###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
 use namespace::clean 0.04 -except => [qw(meta)];
 
@@ -55,7 +51,7 @@ sub encrypt {
 	}
 	else {
 		# For now, we only do XOR
-		confess 'At this time the only supported encryption is xor';
+		Moose->throw_error('At this time the only supported encryption is xor');
 	}
 
 	# Return the encrypted byte stream
