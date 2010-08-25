@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 ###############################################################################
 # MOOSE TYPE DECLARATIONS
@@ -73,7 +73,7 @@ Net::NSCA::Client::Library - Types library
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::Library> version 0.006
+This documentation refers to version 0.007
 
 =head1 SYNOPSIS
 
@@ -84,7 +84,8 @@ This documentation refers to L<Net::NSCA::Client::Library> version 0.006
 
 =head1 DESCRIPTION
 
-This module provides types for L<Net::NSCA::Client> and family.
+This module provides types for L<Net::NSCA::Client|Net::NSCA::Client> and
+family.
 
 =head1 METHODS
 
@@ -95,7 +96,8 @@ No methods.
 =head2 Hostname
 
 This specifies a hostname. This is validated using the
-L<Data::Validate::Domain> library with the C<is_hostname> function.
+L<Data::Validate::Domain|Data::Validate::Domain> library with the
+C<is_hostname> function.
 
 =head2 InitializationVector
 
@@ -113,15 +115,15 @@ This module is dependent on the following modules:
 
 =over 4
 
-=item * L<Data::Validate::Domain> 0.02
+=item * L<Data::Validate::Domain|Data::Validate::Domain> 0.02
 
-=item * L<MooseX::Types> 0.08
+=item * L<MooseX::Types|MooseX::Types> 0.08
 
-=item * L<MooseX::Types::Moose>
+=item * L<MooseX::Types::Moose|MooseX::Types::Moose>
 
-=item * L<Readonly> 1.03
+=item * L<Readonly|Readonly> 1.03
 
-=item * L<namespace::clean> 0.04
+=item * L<namespace::clean|namespace::clean> 0.04
 
 =back
 

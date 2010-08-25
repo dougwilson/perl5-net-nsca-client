@@ -7,16 +7,12 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 ###############################################################################
 # MOOSE
 use Moose 0.89;
 use MooseX::StrictConstructor 0.08;
-
-###############################################################################
-# MODULES
-use English qw(-no_match_vars);
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -55,7 +51,7 @@ sub encrypt {
 	}
 	else {
 		# For now, we only do XOR
-		confess 'At this time the only supported encryption is xor';
+		Moose->throw_error('At this time the only supported encryption is xor');
 	}
 
 	# Return the encrypted byte stream
@@ -105,8 +101,7 @@ a connection.
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::Connection::TLS> version
-0.006
+This documentation refers to version 0.007
 
 =head1 SYNOPSIS
 
@@ -195,11 +190,11 @@ B<TODO: Write this>
 
 =over
 
-=item * L<Moose> 0.89
+=item * L<Moose|Moose> 0.89
 
-=item * L<MooseX::StrictConstructor> 0.08
+=item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
 
-=item * L<namespace::clean> 0.04
+=item * L<namespace::clean|namespace::clean> 0.04
 
 =back
 

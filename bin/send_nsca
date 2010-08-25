@@ -7,7 +7,7 @@ use warnings 'all';
 ###########################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 ###########################################################################
 # MODULES
@@ -177,13 +177,13 @@ send_nsca - Send reports to NSCA just like send_nsca in NSCA 2.7.2
 
 =head1 VERSION
 
-This documentation refers to send_nsca version 0.006
+This documentation refers to send_nsca version 0.007
 
 =head1 DESCRIPTION
 
 This utility is made to mimic the functionality and usage of the send_nsca
-program distributed with NSCA 2.7.2, but use the L<Net::NSCA::Client> Perl
-library.
+program distributed with NSCA 2.7.2, but use the L<Net::NSCA::Client|Net::NSCA::Client>
+Perl library.
 
 =head1 USAGE
 
@@ -226,7 +226,7 @@ seconds. If not specified, the timeout will be 10 seconds.
 =head2 C<-d>
 
 This switch takes a string that will be used as the input delimiter. If not
-specified, then will default to a tab. See L</Input Delimiter> for defails
+specified, then will default to a tab. See L</Input Delimiter> for details
 on what this does.
 
 =head2 C<-c>
@@ -280,7 +280,7 @@ This specified XOR encryption.
 
 =head2 Input Delimiter
 
-The input delimiter is what seperates the different values coming in on the
+The input delimiter is what separates the different values coming in on the
 program input (C<STDIN>). The default is the tab character, unless changed
 by the use of the L</-d> switch.
 
@@ -308,15 +308,15 @@ Please refer to the STDERR stream for details of the message.
 
 =over
 
-=item * L<Carp>
+=item * L<Carp|Carp>
 
-=item * L<English>
+=item * L<English|English>
 
-=item * L<Getopt::Long> 2.33
+=item * L<Getopt::Long|Getopt::Long> 2.33
 
-=item * L<Net::NSCA::Client> 0.001
+=item * L<Net::NSCA::Client|Net::NSCA::Client> 0.001
 
-=item * L<Readonly> 1.03
+=item * L<Readonly|Readonly> 1.03
 
 =back
 

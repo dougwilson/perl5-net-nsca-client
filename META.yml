@@ -3,16 +3,14 @@ abstract: 'Send passive checks to Nagios locally and remotely.'
 author:
   - 'Douglas Christopher Wilson <doug@somethingdoug.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
   Test::Class: 0.33
   Test::Command: 0.08
   Test::Exception: 0.03
   Test::More: 0.94
   Test::Requires: 0.02
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 0.91'
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,6 +21,28 @@ no_index:
     - inc
     - t
     - xt
+provides:
+  Net::NSCA::Client:
+    file: lib/Net/NSCA/Client.pm
+    version: 0.007
+  Net::NSCA::Client::Connection:
+    file: lib/Net/NSCA/Client/Connection.pm
+    version: 0.007
+  Net::NSCA::Client::Connection::TLS:
+    file: lib/Net/NSCA/Client/Connection/TLS.pm
+    version: 0.007
+  Net::NSCA::Client::DataPacket:
+    file: lib/Net/NSCA/Client/DataPacket.pm
+    version: 0.007
+  Net::NSCA::Client::InitialPacket:
+    file: lib/Net/NSCA/Client/InitialPacket.pm
+    version: 0.007
+  Net::NSCA::Client::Library:
+    file: lib/Net/NSCA/Client/Library.pm
+    version: 0.007
+  Net::NSCA::Client::ServerConfig:
+    file: lib/Net/NSCA/Client/ServerConfig.pm
+    version: 0.007
 requires:
   Convert::Binary::C: 0.74
   Data::Rand::Obscure: 0.020
@@ -36,9 +56,9 @@ requires:
   MooseX::Types: 0.08
   Readonly: 1.03
   namespace::clean: 0.04
-  perl: 5.8.1
+  perl: 5.008001
 resources:
   homepage: http://github.com/dougwilson/perl5-net-nsca-client/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/dougwilson/perl5-net-nsca-client.git
-version: 0.006
+version: 0.007

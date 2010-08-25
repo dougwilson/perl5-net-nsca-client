@@ -1,4 +1,4 @@
-package Test::Net::NSCA::Client;
+package MyTest::Net::NSCA::Client;
 
 use strict;
 use warnings 'all';
@@ -6,25 +6,9 @@ use warnings 'all';
 use Test::Exception 0.03;
 use Test::More 0.18;
 
-use base 'Test::Class';
+use base qw[MyTest::Class];
 
 # TODO: Write more tests for this class
-
-sub class { 'Net::NSCA::Client' }
-
-sub startup : Tests(startup) {
-	my ($test) = @_;
-
-	# Get the name of the class we are testing
-	my $class = $test->class;
-
-	# Load the class to test
-	eval "use $class";
-
-	die $@ if $@;
-
-	return;
-}
 
 sub constructor_new : Tests(3) {
 	my ($test) = @_;

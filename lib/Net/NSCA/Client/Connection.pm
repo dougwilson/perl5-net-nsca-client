@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 ###############################################################################
 # MOOSE
@@ -23,6 +23,7 @@ use Net::NSCA::Client::Library qw(Hostname PortNumber Timeout);
 use English qw(-no_match_vars);
 use IO::Socket::INET;
 use Net::NSCA::Client::InitialPacket;
+use Net::NSCA::Client::ServerConfig ();
 use Readonly 1.03;
 
 ###############################################################################
@@ -55,6 +56,12 @@ has remote_port => (
 	isa => PortNumber,
 
 	required => 1,
+);
+has server_config => (
+	is  => 'ro',
+	isa => 'Net::NSCA::Client::ServerConfig',
+
+	default => sub { Net::NSCA::Client::ServerConfig->new },
 );
 has timeout => (
 	is  => 'rw',
@@ -92,6 +99,12 @@ sub restart {
 sub send_data_packet {
 	my ($self, $data_packet) = @_;
 
+	if ($self->server_config != $data_packet->server_config) {
+		# The server's configuration for the packet does not match the connection
+		Moose->throw_error(sprintf 'Unable to send data packet over connection: %s',
+			'Data packet server configuration does not match connection server configration');
+	}
+
 	if ($data_packet->unix_timestamp != $self->initial_packet->unix_timestamp) {
 		# The timestamp of the pack is incorrect. Repackage the data packet
 		# to the correct timestamp.
@@ -101,7 +114,7 @@ sub send_data_packet {
 	}
 
 	# Get the byte representation of the packet
-	my $byte_packet = $data_packet->to_string;
+	my $byte_packet = $data_packet->raw_packet;
 
 	if ($self->has_transport_layer_security) {
 		# Encrypt the data packet
@@ -114,8 +127,8 @@ sub send_data_packet {
 	# Send the data packet over the socket
 	if (!defined $self->socket->syswrite($byte_packet)) {
 		# An error occurred during transmission
-		confess sprintf 'An error occurred during data packet transmission: %s',
-			$ERRNO;
+		Moose->throw_error(sprintf 'An error occurred during data packet transmission: %s',
+			$ERRNO);
 	}
 
 	# Reset the connection after a successful write
@@ -136,10 +149,13 @@ sub _build_initial_packet {
 	# Read the bytes
 	## no critic (Subroutines::ProtectPrivateSubs)
 	$self->socket->sysread($received_bytes,
-		Net::NSCA::Client::InitialPacket::_init_packet_struct()->sizeof('init_packet_struct'));
+		$self->server_config->_c_packer->sizeof('init_packet_struct'));
 
 	# Create the initial packet object
-	my $initial_packet = Net::NSCA::Client::InitialPacket->new($received_bytes);
+	my $initial_packet = Net::NSCA::Client::InitialPacket->new(
+		raw_packet    => $received_bytes,
+		server_config => $self->server_config,
+	);
 
 	# Return the initial packet
 	return $initial_packet;
@@ -158,8 +174,8 @@ sub _build_socket {
 
 	if (!defined $socket) {
 		# The socket failed to be created
-		confess sprintf 'Creating a new socket resulted in %s',
-			$ERRNO;
+		Moose->throw_error(sprintf 'Creating a new socket resulted in %s',
+			$ERRNO);
 	}
 
 	# Return the socket
@@ -181,7 +197,7 @@ the server.
 
 =head1 VERSION
 
-This documentation refers to L<Net::NSCA::Client::Connection> version 0.006
+This documentation refers to version 0.007
 
 =head1 SYNOPSIS
 
@@ -233,8 +249,9 @@ L</ATTRIBUTES> section).
 
 =head2 initial_packet
 
-This is a L<Net::NSCA::Client::InitialPacket> object which represents the
-initial packet received when the connection to the NSCA server was established.
+This is a L<Net::NSCA::Client::InitialPacket|Net::NSCA::Client::InitialPacket>
+object which represents the initial packet received when the connection to
+the NSCA server was established.
 
 =head2 remote_host
 
@@ -248,6 +265,13 @@ B<Required>
 
 This is the port number of the remote NSCA server.
 
+=head2 server_config
+
+This specifies the configuration of the remote NSCA server. See
+L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig> for details
+about using this. Typically this does not need to be specified unless the
+NSCA server was compiled with customizations.
+
 =head2 timeout
 
 This is the timeout for reading from the socket. The default is set to
@@ -255,13 +279,14 @@ L</$DEFAULT_TIMEOUT>.
 
 =head2 transport_layer_security
 
-This is a L<Net::NSCA::Client::Connection::TLS> object that specifies the
-transport layer security that will be used when sending the data packet.
+This is a L<Net::NSCA::Client::Connection::TLS|Net::NSCA::Client::Connection::TLS>
+object that specifies the transport layer security that will be used when
+sending the data packet.
 
 =head2 socket
 
-This is the socket object (L<IO::Socket::INET>) that represents the TCP
-connection to the NSCA server.
+This is the socket object (L<IO::Socket::INET|O::Socket::INET>) that
+represents the TCP connection to the NSCA server.
 
 =head1 METHODS
 
@@ -282,14 +307,14 @@ layer security.
 =head2 send_data_packet
 
 This will send a data packet to the remote NSCA server. The method takes one
-argument which is the L<Net::NSCA::Client::DataPacket> object. If the UNIX
-timestamp of the data packet is not set to the correct timestamp the server
-is expecting, then the data packet is cloned and the correct timestamp is set
-before sending the packet.
+argument which is the L<Net::NSCA::Client::DataPacket|Net::NSCA::Client::DataPacket>
+object. If the UNIX timestamp of the data packet is not set to the correct
+timestamp the server is expecting, then the data packet is cloned and the
+correct timestamp is set before sending the packet.
 
 =head1 CONSTANTS
 
-Constants provided by this library are protected by the L<Readonly> module.
+Constants provided by this library are protected by the L<Readonly|Readonly> module.
 
 =head2 C<$DEFAULT_TIMEOUT>
 
@@ -303,19 +328,21 @@ This is the number of bytes that will be read from the socket at a time.
 
 =over
 
-=item * L<English>
+=item * L<English|English>
 
-=item * L<IO::Socket::INET>
+=item * L<IO::Socket::INET|IO::Socket::INET>
 
-=item * L<Net::NSCA::Client::InitialPacket>
+=item * L<Net::NSCA::Client::InitialPacket|Net::NSCA::Client::InitialPacket>
 
-=item * L<Moose> 0.89
+=item * L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig>
 
-=item * L<MooseX::StrictConstructor> 0.08
+=item * L<Moose|Moose> 0.89
 
-=item * L<Readonly> 1.03
+=item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
 
-=item * L<namespace::clean> 0.04
+=item * L<Readonly|Readonly> 1.03
+
+=item * L<namespace::clean|namespace::clean> 0.04
 
 =back
 

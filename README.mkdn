@@ -1,4 +1,4 @@
-Net-NSCA-Client 0.006
+Net-NSCA-Client 0.007
 =====================
 
 INSTALLATION
@@ -6,10 +6,10 @@ INSTALLATION
 
 To install this module, run the following commands:
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
 
 SCRIPTS
 -------
