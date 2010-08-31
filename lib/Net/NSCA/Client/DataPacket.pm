@@ -71,7 +71,7 @@ has server_config => (
 	isa => 'Net::NSCA::Client::ServerConfig',
 
 	default => sub { Net::NSCA::Client::ServerConfig->new },
-	traits  => [qw(Clone)],
+	# Immutable so no need to recursively clone
 );
 has service_description => (
 	is  => 'ro',
