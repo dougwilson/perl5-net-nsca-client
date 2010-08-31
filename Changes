@@ -1,6 +1,10 @@
 Revision history for Net-NSCA-Client
 ====================================
 
+0.008 Mon, August 30, 2010 22:11:22 -0400
+  * FIX: Actually sending a report was broken with a message about
+    not being able to clone something.
+
 0.007 Tue, August 24, 2010 10:18:12 -0400
   * NEW: This module can now communicate with NSCA servers that have
     been custom-compiled with different packet constants.

@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.007';
+our $VERSION   = '0.008';
 
 ###############################################################################
 # MOOSE
@@ -71,7 +71,7 @@ has server_config => (
 	isa => 'Net::NSCA::Client::ServerConfig',
 
 	default => sub { Net::NSCA::Client::ServerConfig->new },
-	traits  => [qw(Clone)],
+	# Immutable so no need to recursively clone
 );
 has service_description => (
 	is  => 'ro',
@@ -221,7 +221,7 @@ Net::NSCA::Client::DataPacket - Implements data packet for the NSCA protocol
 
 =head1 VERSION
 
-This documentation refers to version 0.007
+This documentation refers to version 0.008
 
 =head1 SYNOPSIS
 
