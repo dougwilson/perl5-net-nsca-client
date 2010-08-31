@@ -24,25 +24,25 @@ no_index:
 provides:
   Net::NSCA::Client:
     file: lib/Net/NSCA/Client.pm
-    version: 0.007
+    version: 0.008
   Net::NSCA::Client::Connection:
     file: lib/Net/NSCA/Client/Connection.pm
-    version: 0.007
+    version: 0.008
   Net::NSCA::Client::Connection::TLS:
     file: lib/Net/NSCA/Client/Connection/TLS.pm
-    version: 0.007
+    version: 0.008
   Net::NSCA::Client::DataPacket:
     file: lib/Net/NSCA/Client/DataPacket.pm
-    version: 0.007
+    version: 0.008
   Net::NSCA::Client::InitialPacket:
     file: lib/Net/NSCA/Client/InitialPacket.pm
-    version: 0.007
+    version: 0.008
   Net::NSCA::Client::Library:
     file: lib/Net/NSCA/Client/Library.pm
-    version: 0.007
+    version: 0.008
   Net::NSCA::Client::ServerConfig:
     file: lib/Net/NSCA/Client/ServerConfig.pm
-    version: 0.007
+    version: 0.008
 requires:
   Convert::Binary::C: 0.74
   Data::Rand::Obscure: 0.020
@@ -61,4 +61,4 @@ resources:
   homepage: http://github.com/dougwilson/perl5-net-nsca-client/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/dougwilson/perl5-net-nsca-client.git
-version: 0.007
+version: 0.008

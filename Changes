@@ -1,7 +1,7 @@
 Revision history for Net-NSCA-Client
 ====================================
 
-0.008 TO BE RELEASED
+0.008 Mon, August 30, 2010 22:11:22 -0400
   * FIX: Actually sending a report was broken with a message about
     not being able to clone something.
 
