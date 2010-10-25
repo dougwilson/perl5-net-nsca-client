@@ -32,11 +32,18 @@ __PACKAGE__->meta->add_package_symbol(q{&("!="} => sub { !$_[0]->is_compatible_w
 
 ###############################################################################
 # PRIVATE CONSTANTS
+const my $ALIGNMENT_BIT_RATIO => 8;
 const my $BYTES_FOR_16BITS => 2;
 const my $BYTES_FOR_32BITS => 4;
 
 ###############################################################################
 # ATTRIBUTES
+has alignment => (
+	is  => 'ro',
+	isa => 'Int',
+
+	default => 32,
+);
 has initialization_vector_length => (
 	is  => 'ro',
 	isa => 'Int',
@@ -140,7 +147,7 @@ sub _build_c_packer {
 	my ($self) = @_;
 
 	# Get a new packer object
-	my $packer = _setup_c_object();
+	my $packer = $self->_setup_c_object();
 
 	# Install the two structures into the C object
 	$self->_install_initial_packet_struct($packer);
@@ -215,26 +222,8 @@ sub _repack_structure {
 	# Return the packed structure
 	return $self->_c_packer->pack($structure_name => $args, $packet);
 }
-sub _unpack_structure {
-	my ($self, $structure_name, $packet) = @_;
-
-	my $unpacked;
-
-	if (ref $packet eq 'SCALAR') {
-		# The packet is a reference, so it should be deferenced
-		$unpacked = $self->_c_packer->unpack($structure_name => ${$packet});
-	}
-	else {
-		$unpacked = $self->_c_packer->unpack($structure_name => $packet);
-	}
-
-	return $unpacked;
-}
-
-###############################################################################
-# PRIVATE FUNCTIONS
 sub _setup_c_object {
-	my ($c) = @_;
+	my ($self, $c) = @_;
 
 	# If no object provided, create a new one
 	$c ||= Convert::Binary::C->new;
@@ -242,8 +231,8 @@ sub _setup_c_object {
 	# Set the memory structure to store in network order
 	$c->ByteOrder('BigEndian');
 
-	# The alignment always seems to be 4 bytes, so set the alignment here
-	$c->Alignment($BYTES_FOR_32BITS);
+	# So set the alignment here
+	$c->Alignment(int $self->alignment / $ALIGNMENT_BIT_RATIO);
 
 	# Create a HASH of sizes to types
 	my %int_sizes;
@@ -275,6 +264,24 @@ sub _setup_c_object {
 	# Return the object
 	return $c;
 }
+sub _unpack_structure {
+	my ($self, $structure_name, $packet) = @_;
+
+	my $unpacked;
+
+	if (ref $packet eq 'SCALAR') {
+		# The packet is a reference, so it should be deferenced
+		$unpacked = $self->_c_packer->unpack($structure_name => ${$packet});
+	}
+	else {
+		$unpacked = $self->_c_packer->unpack($structure_name => $packet);
+	}
+
+	return $unpacked;
+}
+
+###############################################################################
+# PRIVATE FUNCTIONS
 sub _string_randpad_pack {
 	my ($string, $c, $type, $struct) = @_;
 
@@ -363,6 +370,11 @@ This documentation refers to version 0.008
       status   => $Net::NSCA::Client::STATUS_OK,
   );
 
+  # NSCA machine is 64-bit
+  my $config = Net::NSCA::Client::ServerConfig->new(
+      alignment => 64,
+  );
+
 =head1 DESCRIPTION
 
 When NSCA is compiled, there are constants that define the size of the packets
@@ -397,6 +409,12 @@ L</ATTRIBUTES> section).
 
   # Get an attribute
   my $value = $object->attribute_name;
+
+=head2 alignment
+
+This specifies the bit alignment of the NSCA server. If NSCA is compiled on
+a 32-bit machine, this should be C<32> (which is the default). Likewise a
+64-bit NSCA server should be set to C<64>.
 
 =head2 initialization_vector_length
 
