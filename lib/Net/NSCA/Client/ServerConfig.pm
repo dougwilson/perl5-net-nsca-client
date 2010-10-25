@@ -158,12 +158,12 @@ sub _install_initial_packet_struct {
 	my $INITIALIZATION_VECTOR_LENGTH = $self->initialization_vector_length;
 
 	# Add the init_packet_struct structure
-	$c->parse(<<"ENDC");
+	$c->parse(<<"	ENDC");
 		struct init_packet_struct {
 			char      iv[$INITIALIZATION_VECTOR_LENGTH];
 			u_int32_t timestamp;
 		};
-ENDC
+	ENDC
 
 	# Tag the IV as a binary string
 	$c->tag('init_packet_struct.iv', Format => 'Binary');
@@ -180,7 +180,7 @@ sub _install_data_packet_struct {
 	my $MAX_SERVICE_MESSAGE_LENGTH     = $self->max_service_message_length;
 
 	# Add the data_packet_struct structure
-	$c->parse(<<"ENDC");
+	$c->parse(<<"	ENDC");
 		struct data_packet_struct {
 			int16_t   packet_version;
 			u_int32_t crc32_value;
@@ -190,7 +190,7 @@ sub _install_data_packet_struct {
 			char      svc_description[$MAX_SERVICE_DESCRIPTION_LENGTH];
 			char      plugin_output[$MAX_SERVICE_MESSAGE_LENGTH];
 		};
-ENDC
+	ENDC
 
 	# Add the string hooks to all the string members
 	foreach my $string_member (qw(host_name svc_description plugin_output)) {
