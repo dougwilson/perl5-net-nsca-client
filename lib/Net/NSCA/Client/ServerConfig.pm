@@ -17,6 +17,7 @@ use MooseX::StrictConstructor 0.08;
 ###############################################################################
 # MODULES
 use Convert::Binary::C 0.74 ();
+use List::MoreUtils ();
 use Readonly 1.03;
 
 ###############################################################################
@@ -77,13 +78,16 @@ has _c_packer => (
 sub is_compatible_with {
 	my ($self, $server_config) = @_;
 
+	# Attribute list to compare
+	my @attribute = (qw[
+		initialization_vector_length
+		max_description_length
+		max_hostname_length
+		max_service_message_length
+	]);
+
 	# Compatible if all attributes are equal
-	return $server_config->isa(ref $self)
-	    && $self->initialization_vector_length == $server_config->initialization_vector_length
-	    && $self->max_description_length       == $server_config->max_description_length
-	    && $self->max_hostname_length          == $server_config->max_hostname_length
-	    && $self->max_service_message_length   == $server_config->max_service_message_length
-	;
+	return List::MoreUtils::all { $self->$_ == $server_config->$_ } @attribute;
 }
 sub pack_data_packet {
 	my ($self, $args) = @_;
