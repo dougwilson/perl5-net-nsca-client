@@ -22,7 +22,6 @@ use Net::NSCA::Client::Library qw(InitializationVector);
 # MODULES
 use Data::Rand::Obscure 0.020;
 use Net::NSCA::Client::ServerConfig ();
-use Readonly 1.03;
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -32,11 +31,6 @@ use namespace::clean 0.04 -except => [qw(meta)];
 # OVERLOADED FUNCTIONS
 __PACKAGE__->meta->add_package_symbol(q{&()}  => sub {                   });
 __PACKAGE__->meta->add_package_symbol(q{&(""} => sub { shift->raw_packet });
-
-###############################################################################
-# PRIVATE CONSTANTS
-Readonly my $BYTES_FOR_16BITS => 2;
-Readonly my $BYTES_FOR_32BITS => 4;
 
 ###############################################################################
 # ATTRIBUTES
@@ -256,8 +250,6 @@ string representation is what will be sent over the network.
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
 
 =item * L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig>
-
-=item * L<Readonly|Readonly> 1.03
 
 =item * L<namespace::clean|namespace::clean> 0.04
 

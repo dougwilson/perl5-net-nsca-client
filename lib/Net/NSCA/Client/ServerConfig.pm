@@ -16,9 +16,9 @@ use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
 # MODULES
+use Const::Fast qw(const);
 use Convert::Binary::C 0.74 ();
 use List::MoreUtils ();
-use Readonly 1.03;
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -32,8 +32,8 @@ __PACKAGE__->meta->add_package_symbol(q{&("!="} => sub { !$_[0]->is_compatible_w
 
 ###############################################################################
 # PRIVATE CONSTANTS
-Readonly my $BYTES_FOR_16BITS => 2;
-Readonly my $BYTES_FOR_32BITS => 4;
+const my $BYTES_FOR_16BITS => 2;
+const my $BYTES_FOR_32BITS => 4;
 
 ###############################################################################
 # ATTRIBUTES
@@ -476,13 +476,15 @@ values. The raw packet may be given as a string or as a scalar reference.
 
 =over
 
+=item * L<Const::Fast|Const::Fast>
+
 =item * L<Convert::Binary::C|Convert::Binary::C> 0.74
+
+=item * L<List::MoreUtils|List::MoreUtils>
 
 =item * L<Moose|Moose> 0.89
 
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
-
-=item * L<Readonly|Readonly> 1.03
 
 =item * L<namespace::clean|namespace::clean> 0.04
 

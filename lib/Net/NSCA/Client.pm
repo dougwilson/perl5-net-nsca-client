@@ -20,11 +20,11 @@ use Net::NSCA::Client::Library qw(Hostname PortNumber Timeout);
 
 ###############################################################################
 # MODULES
+use Const::Fast qw(const);
 use Net::NSCA::Client::Connection;
 use Net::NSCA::Client::Connection::TLS;
 use Net::NSCA::Client::DataPacket;
 use Net::NSCA::Client::ServerConfig ();
-use Readonly 1.03;
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -32,13 +32,13 @@ use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
 # CONSTANTS
-Readonly our $DEFAULT_HOST    => '127.0.0.1';
-Readonly our $DEFAULT_PORT    => 5667;
-Readonly our $DEFAULT_TIMEOUT => 10;
-Readonly our $STATUS_OK       => 0;
-Readonly our $STATUS_WARNING  => 1;
-Readonly our $STATUS_CRITICAL => 2;
-Readonly our $STATUS_UNKNOWN  => 3;
+const our $DEFAULT_HOST    => '127.0.0.1';
+const our $DEFAULT_PORT    => 5667;
+const our $DEFAULT_TIMEOUT => 10;
+const our $STATUS_OK       => 0;
+const our $STATUS_WARNING  => 1;
+const our $STATUS_CRITICAL => 2;
+const our $STATUS_UNKNOWN  => 3;
 
 ###############################################################################
 # ATTRIBUTES
@@ -341,6 +341,8 @@ This is the status value when a service is UNKNOWN
 
 =over
 
+=item * L<Const::Fast|Const::Fast>
+
 =item * L<Moose|Moose> 0.89
 
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
@@ -350,8 +352,6 @@ This is the status value when a service is UNKNOWN
 =item * L<Net::NSCA::Client::DataPacket|Net::NSCA::Client::DataPacket>
 
 =item * L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig>
-
-=item * L<Readonly|Readonly> 1.03
 
 =item * L<namespace::clean|namespace::clean> 0.04
 

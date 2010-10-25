@@ -22,27 +22,15 @@ with 'MooseX::Clone';
 # MODULES
 use Digest::CRC ();
 use Net::NSCA::Client::ServerConfig ();
-use Readonly 1.03;
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
 use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
-# CONSTANTS
-Readonly our $MAX_HOSTNAME_LENGTH            => 64;
-Readonly our $MAX_SERVICE_DESCRIPTION_LENGTH => 128;
-Readonly our $MAX_SERVICE_MESSAGE_LENGTH     => 512;
-
-###############################################################################
 # OVERLOADED FUNCTIONS
 __PACKAGE__->meta->add_package_symbol(q{&()}  => sub {                   });
 __PACKAGE__->meta->add_package_symbol(q{&(""} => sub { shift->raw_packet });
-
-###############################################################################
-# PRIVATE CONSTANTS
-Readonly my $BYTES_FOR_16BITS => 2;
-Readonly my $BYTES_FOR_32BITS => 4;
 
 ###############################################################################
 # ATTRIBUTES
@@ -354,8 +342,6 @@ representation is what will be sent over the network.
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
 
 =item * L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig>
-
-=item * L<Readonly|Readonly> 1.03
 
 =item * L<namespace::clean|namespace::clean> 0.04
 

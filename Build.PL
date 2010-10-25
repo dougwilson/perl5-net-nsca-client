@@ -31,6 +31,7 @@ my $build = Module::Build->new(
 	# Module that are required
 	requires => {
 		'perl'                      => '5.008001',
+		'Const::Fast'               => 0,
 		'Convert::Binary::C'        => '0.74',
 		'Data::Rand::Obscure'       => '0.020',
 		'Data::Validate::Domain'    => '0.02',
@@ -42,7 +43,6 @@ my $build = Module::Build->new(
 		'MooseX::Clone'             => 0,
 		'MooseX::StrictConstructor' => '0.08',
 		'MooseX::Types'             => '0.08',
-		'Readonly'                  => '1.03',
 		'namespace::clean'          => '0.04',
 	},
 

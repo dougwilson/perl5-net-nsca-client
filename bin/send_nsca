@@ -12,11 +12,11 @@ our $VERSION   = '0.007';
 ###########################################################################
 # MODULES
 use Carp qw(confess);
+use Const::Fast qw(const);
 use English qw(-no_match_vars);
 use Getopt::Long 2.33 qw(:config auto_help auto_version);
 use Net::NSCA::Client 0.001;
 use Pod::Usage 1.36;
-use Readonly 1.03;
 
 ###########################################################################
 # PRIVATE VARIABLES
@@ -28,20 +28,20 @@ my $nsca_timeout    = $Net::NSCA::Client::DEFAULT_TIMEOUT;
 
 ###########################################################################
 # PRIVATE CONSTANTS
-Readonly my %COMMAND_LINE_CONFIG => (
+const my %COMMAND_LINE_CONFIG => (
 	'c=s'  => \$configuration_file,
 	'd=s'  => \$input_delimiter,
 	'H=s'  => \$nsca_hostname,
 	'p=i'  => \$nsca_port,
 	'to=i' => \$nsca_timeout,
 );
-Readonly my %ENCRYPTION_METHOD => (
+const my %ENCRYPTION_METHOD => (
 	0 => 'none',
 	1 => 'xor',
 );
-Readonly my $EXIT_SUCCESS => 0;
-Readonly my $EXIT_FAILURE => 3;
-Readonly my $INPUT_FIELD_COUNT => 4;
+const my $EXIT_SUCCESS => 0;
+const my $EXIT_FAILURE => 3;
+const my $INPUT_FIELD_COUNT => 4;
 
 ###########################################################################
 # PROCESS COMMAND LINE ARGUMENTS
@@ -310,13 +310,13 @@ Please refer to the STDERR stream for details of the message.
 
 =item * L<Carp|Carp>
 
+=item * L<Const::Fast|Const::Fast>
+
 =item * L<English|English>
 
 =item * L<Getopt::Long|Getopt::Long> 2.33
 
 =item * L<Net::NSCA::Client|Net::NSCA::Client> 0.001
-
-=item * L<Readonly|Readonly> 1.03
 
 =back
 

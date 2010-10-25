@@ -20,11 +20,11 @@ use Net::NSCA::Client::Library qw(Hostname PortNumber Timeout);
 
 ###############################################################################
 # MODULES
+use Const::Fast qw(const);
 use English qw(-no_match_vars);
 use IO::Socket::INET;
 use Net::NSCA::Client::InitialPacket;
 use Net::NSCA::Client::ServerConfig ();
-use Readonly 1.03;
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -32,8 +32,8 @@ use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
 # CONSTANTS
-Readonly our $DEFAULT_TIMEOUT  => 10;
-Readonly our $SOCKET_READ_SIZE => 512;
+const our $DEFAULT_TIMEOUT  => 10;
+const our $SOCKET_READ_SIZE => 512;
 
 ###############################################################################
 # ATTRIBUTES
@@ -314,7 +314,8 @@ correct timestamp is set before sending the packet.
 
 =head1 CONSTANTS
 
-Constants provided by this library are protected by the L<Readonly|Readonly> module.
+Constants provided by this library are protected by the
+L<Const::Fast|Const::Fast> module.
 
 =head2 C<$DEFAULT_TIMEOUT>
 
@@ -328,6 +329,8 @@ This is the number of bytes that will be read from the socket at a time.
 
 =over
 
+=item * L<Const::Fast|Const::Fast>
+
 =item * L<English|English>
 
 =item * L<IO::Socket::INET|IO::Socket::INET>
@@ -339,8 +342,6 @@ This is the number of bytes that will be read from the socket at a time.
 =item * L<Moose|Moose> 0.89
 
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
-
-=item * L<Readonly|Readonly> 1.03
 
 =item * L<namespace::clean|namespace::clean> 0.04
 

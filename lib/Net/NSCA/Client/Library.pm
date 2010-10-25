@@ -24,8 +24,8 @@ use MooseX::Types::Moose qw(Int Str);
 
 ###############################################################################
 # MODULES
+use Const::Fast qw(const);
 use Data::Validate::Domain 0.02;
-use Readonly 1.03;
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -33,9 +33,9 @@ use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
 # CONSTANTS
-Readonly my $HIGHEST_PORT_NUMBER          => 65_535;
-Readonly my $INITIALIZATION_VECTOR_LENGTH => 128;
-Readonly my $LOWEST_PORT_NUMBER           => 0;
+const my $HIGHEST_PORT_NUMBER          => 65_535;
+const my $INITIALIZATION_VECTOR_LENGTH => 128;
+const my $LOWEST_PORT_NUMBER           => 0;
 
 ###############################################################################
 # TYPE DEFINITIONS
@@ -115,13 +115,13 @@ This module is dependent on the following modules:
 
 =over 4
 
+=item * L<Const::Fast|Const::Fast>
+
 =item * L<Data::Validate::Domain|Data::Validate::Domain> 0.02
 
 =item * L<MooseX::Types|MooseX::Types> 0.08
 
 =item * L<MooseX::Types::Moose|MooseX::Types::Moose>
-
-=item * L<Readonly|Readonly> 1.03
 
 =item * L<namespace::clean|namespace::clean> 0.04
 

@@ -44,6 +44,7 @@ provides:
     file: lib/Net/NSCA/Client/ServerConfig.pm
     version: 0.008
 requires:
+  Const::Fast: 0
   Convert::Binary::C: 0.74
   Data::Rand::Obscure: 0.020
   Data::Validate::Domain: 0.02
@@ -55,7 +56,6 @@ requires:
   MooseX::Clone: 0
   MooseX::StrictConstructor: 0.08
   MooseX::Types: 0.08
-  Readonly: 1.03
   namespace::clean: 0.04
   perl: 5.008001
 resources:
