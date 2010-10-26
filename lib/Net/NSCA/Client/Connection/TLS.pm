@@ -15,8 +15,29 @@ use Moose 0.89;
 use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
+# MODULES
+use Class::MOP ();
+use Const::Fast qw(const);
+
+###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
 use namespace::clean 0.04 -except => [qw(meta)];
+
+###############################################################################
+# PRIVATE CONSTANTS
+const my %encryption_method => (
+	rijndael_128 => [
+		{
+			class  => [qw(Crypt::Rijndael)],
+			method => sub { shift->_validate_rijndael_128->_rijndael_128_encrypt(@_) },
+		},
+		{
+			class  => [qw(Mcrypt)],
+			method => sub { shift->_validate_rijndael_128->_mcrypt_encrypt(@_, 'rijndael-128') },
+		},
+	],
+	xor => [{method => \&_xor_encrypt}],
+);
 
 ###############################################################################
 # ATTRIBUTES
@@ -42,17 +63,33 @@ sub encrypt {
 	# Splice out the arguments
 	my ($byte_stream, $iv) = @args{qw(byte_stream iv)};
 
-	# Set the encrypted byte stream to the byte stream by default
-	my $encrypted_byte_stream = "$byte_stream";
+	if (!exists $encryption_method{$self->encryption_type}) {
+		Moose->throw_error(sprintf 'Unsupported encryption type %s',
+			$self->encryption_type);
+	}
 
-	if ($self->encryption_type eq 'xor') {
-		# This is a custom NSCA XOR "encryption"
-		$encrypted_byte_stream = $self->_xor_encrypt($byte_stream, $iv);
+	# Get encryption method information
+	my $methods = $encryption_method{$self->encryption_type};
+	my $encrypt;
+
+	METHOD:
+	for my $method (@{$methods}) {
+		if (exists $method->{class}) {
+			# This method requires some classes to be loaded
+			CLASS:
+			for my $class (@{$method->{class}}) {
+				Class::MOP::load_class($class);
+			}
+		}
+
+		# Use this method
+		$encrypt = $method->{method};
+
+		last METHOD;
 	}
-	else {
-		# For now, we only do XOR
-		Moose->throw_error('At this time the only supported encryption is xor');
-	}
+
+	# Encrypt the byte stream
+	my $encrypted_byte_stream = $encrypt->($self, $byte_stream, $iv);
 
 	# Return the encrypted byte stream
 	return $encrypted_byte_stream;
@@ -60,6 +97,62 @@ sub encrypt {
 
 ###############################################################################
 # PRIVATE METHODS
+sub _mcrypt_encrypt {
+	my ($self, $byte_stream, $iv, $algorithm) = @_;
+
+	# Create a cipher object
+	my $cipher = Mcrypt->new(
+		algorithm => $algorithm,
+		mode      => 'cfb',
+		verbose   => 0,
+	);
+
+	# Adjust the IV size
+	$iv = _pad_string($iv, $cipher->{IV_SIZE});
+
+	my $key = $self->password;
+
+	if ($cipher->{KEY_SIZE} > length $key) {
+		$key .= "\x00" x ($cipher->{KEY_SIZE} - length $key);
+	}
+
+	$cipher->init($self->password, $iv);
+
+	my $encrypted_stream = join q{}, map { $cipher->encrypt($_) } split qr{}msx, $byte_stream;
+
+	return $encrypted_stream;
+}
+sub _rijndael_128_encrypt {
+	my ($self, $byte_stream, $iv) = @_;
+
+	# Create a cipher object
+	my $cipher = Crypt::Rijndael->new($self->password, Crypt::Rijndael::MODE_ECB());
+
+	# Set the register to the IV
+	my $register = _pad_string($iv, $cipher->blocksize);
+
+	# Encrypt the byte stream
+	my $encrypted_stream = join q{}, map {
+		my $out = $cipher->encrypt($register);
+
+		my $byte = $_ ^ substr $out, 0, 1;
+
+		$register = substr($register, 1) . $byte;
+
+		$byte;
+	} split qr{}msx, $byte_stream;
+
+	return $encrypted_stream;
+}
+sub _validate_rijndael_128 {
+	my ($self) = @_;
+
+	if (!$self->has_password || 32 != length $self->password) {
+		Moose->throw_error('Rijndael-128 must have a 128-bit password');
+	}
+
+	return $self;
+}
 sub _xor_encrypt {
 	my ($self, $byte_stream, $iv) = @_;
 
@@ -84,6 +177,23 @@ sub _xor_encrypt {
 
 	# Return the manipulated byte stream
 	return join q{}, @byte_stream;
+}
+
+###############################################################################
+# PRIVATE FUNCTIONS
+sub _pad_string {
+	my ($string, $to_length) = @_;
+
+	if ($to_length < length $string) {
+		# Chop the end of the string
+		$string = substr $string, 0, $to_length;
+	}
+	elsif ($to_length > length $string) {
+		# Pad with NULL
+		$string .= "\x00" x ($to_length - length $string);
+	}
+
+	return $string;
 }
 
 ###############################################################################
