@@ -7,7 +7,7 @@ build_requires:
   MIME::Base64: 2.00
   Test::Class: 0.33
   Test::Command: 0.08
-  Test::Exception: 0.03
+  Test::Fatal: 0
   Test::More: 0.94
   Test::Requires: 0.02
 configure_requires:

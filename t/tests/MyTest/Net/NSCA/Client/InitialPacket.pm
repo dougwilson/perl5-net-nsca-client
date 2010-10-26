@@ -5,7 +5,7 @@ use warnings 'all';
 
 use Data::Section '-setup';
 use MIME::Base64 2.00 ();
-use Test::Exception 0.03;
+use Test::Fatal;
 use Test::More 0.18;
 
 use base 'MyTest::Class';
@@ -30,7 +30,7 @@ sub constructor_new : Tests(4) {
 	# Constructor with HASHREF
 	$packet = new_ok $class, [\%options];
 
-	dies_ok { $class->new(bad_argument => 1) } 'Constructor dies on non-existant attribute';
+	ok(exception { $class->new(bad_argument => 1) }, 'Constructor dies on non-existant attribute');
 
 	return;
 }
@@ -88,7 +88,7 @@ sub initial_packet_generation : Tests(9) {
 	is $decoded_packet->unix_timestamp       , $packet->unix_timestamp       , 'unix_timestamp decoded correctly';
 
 	# Random bad data fails
-	dies_ok { $class->new('I am garbage') } 'Garbage does not decode';
+	ok(exception { $class->new('I am garbage') }, 'Garbage does not decode');
 
 	# Decode packet and check
 	$decoded_packet = $class->new($test->_packet);

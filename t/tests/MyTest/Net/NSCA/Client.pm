@@ -3,7 +3,7 @@ package MyTest::Net::NSCA::Client;
 use strict;
 use warnings 'all';
 
-use Test::Exception 0.03;
+use Test::Fatal;
 use Test::More 0.18;
 
 use base qw[MyTest::Class];
@@ -22,7 +22,7 @@ sub constructor_new : Tests(3) {
 	# Constructor with no arguments should work
 	my $client = new_ok $class;
 
-	dies_ok { $class->new(bad_argument => 1) } 'Constructor dies on non-existant attribute';
+	ok(exception { $class->new(bad_argument => 1) }, 'Constructor dies on non-existant attribute');
 
 	return;
 }
@@ -47,7 +47,7 @@ sub attribute_remote_host : Tests(6) {
 		is $client->remote_host, ${$class.'::DEFAULT_HOST'}, 'remote_host is defaulting to $DEFAULT_HOST';
 	}
 
-	lives_ok { $client->remote_host('lava.example.net') } 'Setting remote_host to valid value works';
+	ok(!exception { $client->remote_host('lava.example.net') }, 'Setting remote_host to valid value works');
 	is $client->remote_host, 'lava.example.net', 'remote_host setting works';
 
 	return;
@@ -73,12 +73,12 @@ sub attribute_remote_port : Tests(9) {
 		is $client->remote_port, ${$class.'::DEFAULT_PORT'}, 'remote_port is defaulting to $DEFAULT_PORT';
 	}
 
-	lives_ok { $client->remote_port(2) } 'Setting remote_port to valid value works';
+	ok(!exception { $client->remote_port(2) }, 'Setting remote_port to valid value works');
 	is $client->remote_port, 2, 'remote_port setting works';
 
-	dies_ok { $client->remote_port(5.55) } 'Setting remote_port to decimal number fails';
-	dies_ok { $client->remote_port(-2) } 'Setting remote_port to negative number fails';
-	dies_ok { $client->remote_port(9564481) } 'Setting remote_port too large fails';
+	ok(exception { $client->remote_port(5.55) }, 'Setting remote_port to decimal number fails');
+	ok(exception { $client->remote_port(-2) }, 'Setting remote_port to negative number fails');
+	ok(exception { $client->remote_port(9564481) }, 'Setting remote_port too large fails');
 
 	return;
 }
@@ -103,12 +103,12 @@ sub attribute_timeout : Tests(9) {
 		is $client->timeout, ${$class.'::DEFAULT_TIMEOUT'}, 'Timeout is defaulting to $DEFAULT_TIMEOUT';
 	}
 
-	lives_ok { $client->timeout(2) } 'Setting timeout to valid value works';
+	ok(!exception { $client->timeout(2) }, 'Setting timeout to valid value works');
 	is $client->timeout, 2, 'Timeout setting works';
 
-	dies_ok { $client->timeout(5.55) } 'Setting timeout to deciman number fails';
-	dies_ok { $client->timeout(-2) } 'Setting timeout to negative number fails';
-	dies_ok { $client->timeout(0) } 'Setting timeout to 0 fails';
+	ok(exception { $client->timeout(5.55) }, 'Setting timeout to deciman number fails');
+	ok(exception { $client->timeout(-2) }, 'Setting timeout to negative number fails');
+	ok(exception { $client->timeout(0) }, 'Setting timeout to 0 fails');
 
 	return;
 }
