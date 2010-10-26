@@ -3,6 +3,8 @@ abstract: 'Send passive checks to Nagios locally and remotely.'
 author:
   - 'Douglas Christopher Wilson <doug@somethingdoug.com>'
 build_requires:
+  Data::Section: 0
+  MIME::Base64: 2.00
   Test::Class: 0.33
   Test::Command: 0.08
   Test::Exception: 0.03

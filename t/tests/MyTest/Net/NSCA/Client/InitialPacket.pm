@@ -3,6 +3,8 @@ package MyTest::Net::NSCA::Client::InitialPacket;
 use strict;
 use warnings 'all';
 
+use Data::Section '-setup';
+use MIME::Base64 2.00 ();
 use Test::Exception 0.03;
 use Test::More 0.18;
 
@@ -105,21 +107,15 @@ sub initial_packet_generation : Tests(9) {
 	is $decoded_packet->unix_timestamp       , 1254605822         , 'unix_timestamp decoded correctly';
 }
 
-sub _packet {
-	my $packet = <<ENDPACKET;
-1B047577ED091F8A3CC22CACE778AEB3F12403899C75E941565426BE487CAA54DEFEF83F878594A
-18F227C1D4964DE5AB8A3276D9C4DCB8351180741D387D2D7B82FB92F4F83DE05719688A913A78A
-5E3A5F38959C110E17D989575B120EF739EA55FB56D94DE6C5B73C9D2E600CA096A0A45025705EA
-AD7AD033CB0155A0D2F4AC7C3FE
-ENDPACKET
-
-	# Remove all new lines
-	$packet =~ s{[\r\n]+}{}gmsx;
-
-	# Change the hexidecimal to bytes
-	$packet =~ s{(..)}{ chr hex $1 }egmsx;
-
-	return $packet;
+sub _get_base64_section {
+	return MIME::Base64::decode(${__PACKAGE__->section_data($_[0])});
 }
+sub _packet { _get_base64_section('packet') }
 
 1;
+
+__DATA__
+__[ packet ]__
+GwR1d+0JH4o8wiys53ius/EkA4mcdelBVlQmvkh8qlTe/vg/h4WUoY8ifB1JZN5auKMnbZxNy4NR
+GAdB04fS17gvuS9Pg94FcZaIqROnil46XziVnBEOF9mJV1sSDvc56lX7VtlN5sW3PJ0uYAyglqCk
+UCVwXqrXrQM8sBVaDS9Kx8P+
