@@ -122,13 +122,10 @@ sub _mcrypt_encrypt {
 	# Adjust the IV size
 	$iv = _pad_string($iv, $cipher->{IV_SIZE});
 
-	my $key = $self->password;
+	# Pad key with NULLs to the key size
+	my $key = _pad_string($self->password, $cipher->{KEY_SIZE});
 
-	if ($cipher->{KEY_SIZE} > length $key) {
-		$key .= "\x00" x ($cipher->{KEY_SIZE} - length $key);
-	}
-
-	$cipher->init($self->password, $iv);
+	$cipher->init($key, $iv);
 
 	my $encrypted_stream = join q{}, map { $cipher->encrypt($_) } split qr{}msx, $byte_stream;
 
@@ -137,8 +134,11 @@ sub _mcrypt_encrypt {
 sub _rijndael_128_encrypt {
 	my ($self, $byte_stream, $iv) = @_;
 
+	# Pad key with NULLs to the key size
+	my $key = _pad_string($self->password, Crypt::Rijndael->keysize);
+
 	# Create a cipher object
-	my $cipher = Crypt::Rijndael->new($self->password, Crypt::Rijndael::MODE_ECB());
+	my $cipher = Crypt::Rijndael->new($key, Crypt::Rijndael::MODE_ECB());
 
 	# Set the register to the IV
 	my $register = _pad_string($iv, $cipher->blocksize);
@@ -158,10 +158,6 @@ sub _rijndael_128_encrypt {
 }
 sub _validate_rijndael_128 {
 	my ($self) = @_;
-
-	if (!$self->has_password || 32 != length $self->password) {
-		Moose->throw_error('Rijndael-128 must have a 128-bit password');
-	}
 
 	return $self;
 }
