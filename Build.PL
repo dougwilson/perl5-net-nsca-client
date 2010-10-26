@@ -43,6 +43,7 @@ my $build = Module::Build->new(
 		'MooseX::Clone'             => 0,
 		'MooseX::StrictConstructor' => '0.08',
 		'MooseX::Types'             => '0.08',
+		'Try::Tiny'                 => 0,
 		'namespace::clean'          => '0.04',
 	},
 

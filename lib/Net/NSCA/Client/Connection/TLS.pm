@@ -18,6 +18,7 @@ use MooseX::StrictConstructor 0.08;
 # MODULES
 use Class::MOP ();
 use Const::Fast qw(const);
+use Try::Tiny;
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -71,21 +72,32 @@ sub encrypt {
 	# Get encryption method information
 	my $methods = $encryption_method{$self->encryption_type};
 	my $encrypt;
+	my $error;
 
 	METHOD:
 	for my $method (@{$methods}) {
-		if (exists $method->{class}) {
-			# This method requires some classes to be loaded
-			CLASS:
-			for my $class (@{$method->{class}}) {
-				Class::MOP::load_class($class);
+		try {
+			if (exists $method->{class}) {
+				# This method requires some classes to be loaded
+				CLASS:
+				for my $class (@{$method->{class}}) {
+					Class::MOP::load_class($class);
+				}
 			}
+
+			# Use this method
+			$encrypt = $method->{method};
 		}
+		catch {
+			# Record only the first error
+			$error = $_ if !defined $error;
+		};
 
-		# Use this method
-		$encrypt = $method->{method};
+		last METHOD if defined $encrypt;
+	}
 
-		last METHOD;
+	if (!defined $encrypt) {
+		die $error;
 	}
 
 	# Encrypt the byte stream
