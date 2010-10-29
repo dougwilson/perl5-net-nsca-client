@@ -20,7 +20,15 @@ use Const::Fast qw(const);
 use Try::Tiny;
 
 ###########################################################################
+# ALL IMPORTS BEFORE THIS WILL BE ERASED
+use namespace::clean 0.04 -except => [qw(meta)];
+
+###########################################################################
 # PRIVATE CONSTANTS
+const my %CONFIG_VARIABLE_ATTRIBUTE => (
+	encryption_method => 'encryption_method',
+	password          => 'encryption_password',
+);
 const my %CONFIG_VARIABLE_VALUE => (
 	encryption_method => \&_encryption_method_from_number,
 	password          => \&_untaint_password,
@@ -52,9 +60,65 @@ const my %ENCRYPTION_METHOD => (
 	26 => 'safer_plus',
 );
 
-###########################################################################
-# ALL IMPORTS BEFORE THIS WILL BE ERASED
-use namespace::clean 0.04 -except => [qw(meta)];
+###############################################################################
+# ATTRIBUTES
+has config_hash => (
+	is  => 'ro',
+	isa => 'HashRef',
+
+	clearer   => '_clear_config_hash',
+	predicate => 'has_config_hash',
+);
+has encryption_method => (
+	is  => 'ro',
+	isa => 'Str',
+
+	clearer   => '_clear_encryption_method',
+	predicate => 'has_encryption_method',
+);
+has encryption_password => (
+	is  => 'ro',
+	isa => 'Str',
+
+	clearer   => '_clear_encryption_password',
+	predicate => 'has_encryption_password',
+);
+
+###############################################################################
+# CONSTRUCTOR
+around BUILDARGS => sub {
+	my ($original_method, $class, @args) = @_;
+
+	# Call the original method to get args HASHREF
+	my $args = $class->$original_method(@args);
+
+	if (exists $args->{from_io}) {
+		# Object will be constructed from a file IO
+		if (exists $args->{config_hash}) {
+			Moose->throw_error('Cannot specify both from_io and config_hash');
+		}
+
+		# Remove the IO from the argument list
+		my $io = delete $args->{from_io};
+
+		# Parse the file
+		my $config = parse_send_nsca_config($io);
+
+		# Set the config_hash
+		$args->{config_hash} = $config;
+	}
+
+	if (exists $args->{config_hash}) {
+		# We need to read out values in the hash into the individual
+		# attributes.
+		_add_values_from_config_hash(
+			config_hash => $args->{config_hash},
+			destination => $args,
+		);
+	}
+
+	return $args;
+};
 
 ###########################################################################
 # FUNCTIONS
@@ -128,6 +192,25 @@ sub parse_send_nsca_config {
 
 ###########################################################################
 # PRIVATE FUNCTIONS
+sub _add_values_from_config_hash {
+	my (%args) = @_;
+
+	# Get the arguments
+	my ($config, $destination) = @args{qw[config_hash destination]};
+
+	CONFIG_KEY:
+	for my $key (keys %{$config}) {
+		if (exists $CONFIG_VARIABLE_ATTRIBUTE{$key}) {
+			# Get the attribute name for this key
+			my $attr = $CONFIG_VARIABLE_ATTRIBUTE{$key};
+
+			# Set the value in the destination hash
+			$destination->{$attr} = $config->{$key};
+		}
+	}
+
+	return;
+}
 sub _encryption_method_from_number {
 	my ($encryption_number) = @_;
 
@@ -166,10 +249,103 @@ provides parsing routines
 
 This documentation refers to version 0.009
 
+=head1 SYNOPSIS
+
+  # Open file as $file
+  my $config = Net::NSCA::Client::Config->new(
+      from_io => $file,
+  );
+
+  if ($config->has_encryption_method) {
+      say 'Use encryption ', $config->encryption_method;
+  }
+
 =head1 DESCRIPTION
 
 This class provides an interface for reading configuration files for the
 NSCA client.
+
+=head1 CONSTRUCTOR
+
+This is fully object-oriented, and as such before any method can be used,
+the constructor needs to be called to create an object to work with. The
+exception to this is that you may use L</FUNCTIONS> without constructing
+any object.
+
+=head2 new
+
+This will construct a new object.
+
+=over
+
+=item new(%attributes)
+
+C<%attributes> is a HASH where the keys are attributes (specified in the
+L</ATTRIBUTES> section) plus additional constructor-only keys specified
+below.
+
+=item new($attributes)
+
+C<$attributes> is a HASHREF where the keys are attributes (specified in the
+L</ATTRIBUTES> section) plus additional constructor-only keys specified
+below.
+
+=back
+
+Additional keys that may be provided at construction are as follows:
+
+=head3 from_io
+
+This is a perl IO object that will be parsed and the options specified in
+this file will be added to this object on construction. After the object is
+constructed, no references to this IO object are kept and it may be closed.
+Please also see the note about value overwriting in L</config_hash>.
+
+=head1 ATTRIBUTES
+
+  # Get an attribute
+  my $value = $object->attribute_name;
+
+=head2 config_hash
+
+This is a hash reference that contains the raw parsed configuration file.
+Some of the key values may have been modified (like C<encryption_method>
+is changed from a number to a string).
+
+Note that when this is provided to the constructor, any values found in
+this hash that correspond to L</ATTRIBUTES> will cause the attribute values
+provided to the constructor to be overwritten. This means the following is
+expected:
+
+  # Constructing the object like this
+  my $config = Net::NSCA::Client::ConfigFile->new(
+      config_hash         => {password => 'config_password'},
+      encryption_password => 'my_password',
+  );
+
+  # Will cause this test to return true
+  is($config->encryption_password, 'config_password',
+      'config_hash overwrites encryption_password attribute');
+
+=head2 encryption_method
+
+This holds the encryption method as a string as specified in a configuration
+file if L</has_encryption_method> is true.
+
+=head2 encryption_password
+
+This holds the encryption password as a string as specified in a
+configuration file if L</has_encryption_password> is true.
+
+=head1 METHODS
+
+=head2 has_encryption_method
+
+This returns a Boolean if there is a value in L</encryption_method>.
+
+=head2 has_encryption_password
+
+This returns a Boolean if there is a value in L</encryption_password>.
 
 =head1 FUNCTIONS
 
