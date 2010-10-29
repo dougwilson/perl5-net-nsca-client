@@ -27,6 +27,11 @@ const my %ENCRYPTION_METHOD => (
 const my $EXIT_SUCCESS => 0;
 const my $EXIT_FAILURE => 3;
 const my $INPUT_FIELD_COUNT => 4;
+const my %OPTION_AS_NAME => (
+	H  => 'remote_host',
+	p  => 'remote_port',
+	to => 'timeout',
+);
 
 ###########################################################################
 # RUN PROGRAM
@@ -36,9 +41,6 @@ sub run {
 	# Variables to hold configuration
 	my $configuration_file;
 	my $input_delimiter = "\t";
-	my $nsca_hostname   = 'localhost';
-	my $nsca_port       = $Net::NSCA::Client::DEFAULT_PORT;
-	my $nsca_timeout    = $Net::NSCA::Client::DEFAULT_TIMEOUT;
 
 	# Make a command line parser
 	my $args_parser = Getopt::Long::Parser->new(config => [qw(
@@ -47,25 +49,23 @@ sub run {
 
 	# Argument specification
 	my @arg_spec = (
-		'c=s'  => \$configuration_file,
-		'd=s'  => \$input_delimiter,
-		'H=s'  => \$nsca_hostname,
-		'p=i'  => \$nsca_port,
-		'to=i' => \$nsca_timeout,
+		'c=s' => \$configuration_file,
+		'd=s' => \$input_delimiter,
+		'H=s',
+		'p=i',
+		'to=i',
 	);
 
+	my %args;
+
 	# Parse the arguments
-	if (!$args_parser->getoptions(@arg_spec)) {
+	if (!$args_parser->getoptions(\%args, @arg_spec)) {
 		# Parsing the arguments failed for some reason
 		exit $EXIT_FAILURE;
 	}
 
-	# Create the client
-	my $nsca = Net::NSCA::Client->new(
-		remote_host => $nsca_hostname,
-		remote_port => $nsca_port,
-		timeout     => $nsca_timeout,
-	);
+	# Construct the client arguments from the command line options
+	my @client_args = map { $OPTION_AS_NAME{$_} => $args{$_} } keys %args;
 
 	# Read the configuration file
 	if (defined $configuration_file) {
@@ -74,10 +74,14 @@ sub run {
 
 		if ($encryption_method ne 'none') {
 			# Set the password and encryption method on the client
-			$nsca->encryption_password($password);
-			$nsca->encryption_type($encryption_method);
+			push @client_args,
+				encryption_password => $password,
+				encryption_type     => $encryption_method;
 		}
 	}
+
+	# Create the client
+	my $nsca = Net::NSCA::Client->new(@client_args);
 
 	# Read from STDIN (or files)
 	chomp(my $line = <>);
