@@ -159,6 +159,7 @@ sub _install_initial_packet_struct {
 
 	# Add the init_packet_struct structure
 	## no critic (ValuesAndExpressions::RequireUpperCaseHeredocTerminator)
+	## no critic (CodeLayout::ProhibitHardTabs) otherwise editor doesn't know when here-doc terminates
 	$c->parse(<<"	ENDC");
 		struct init_packet_struct {
 			char      iv[$INITIALIZATION_VECTOR_LENGTH];
@@ -182,6 +183,7 @@ sub _install_data_packet_struct {
 
 	# Add the data_packet_struct structure
 	## no critic (ValuesAndExpressions::RequireUpperCaseHeredocTerminator)
+	## no critic (CodeLayout::ProhibitHardTabs) otherwise editor doesn't know when here-doc terminates
 	$c->parse(<<"	ENDC");
 		struct data_packet_struct {
 			int16_t   packet_version;
