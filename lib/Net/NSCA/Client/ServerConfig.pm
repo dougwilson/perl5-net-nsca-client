@@ -158,6 +158,7 @@ sub _install_initial_packet_struct {
 	my $INITIALIZATION_VECTOR_LENGTH = $self->initialization_vector_length;
 
 	# Add the init_packet_struct structure
+	## no critic (ValuesAndExpressions::RequireUpperCaseHeredocTerminator)
 	$c->parse(<<"	ENDC");
 		struct init_packet_struct {
 			char      iv[$INITIALIZATION_VECTOR_LENGTH];
@@ -180,6 +181,7 @@ sub _install_data_packet_struct {
 	my $MAX_SERVICE_MESSAGE_LENGTH     = $self->max_service_message_length;
 
 	# Add the data_packet_struct structure
+	## no critic (ValuesAndExpressions::RequireUpperCaseHeredocTerminator)
 	$c->parse(<<"	ENDC");
 		struct data_packet_struct {
 			int16_t   packet_version;
