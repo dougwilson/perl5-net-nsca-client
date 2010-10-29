@@ -145,8 +145,12 @@ sub _encryption_method_from_number {
 	return $ENCRYPTION_METHOD{$encryption_number};
 }
 sub _untaint_password {
+	my ($password) = @_;
+
 	# The password must not be tainted for some encryption modules
-	return [$_[0] =~ m{\A (.*) \z}msx]->[0];
+	($password) = $password =~ m{\A (.*) \z}msx;
+
+	return $password;
 }
 
 ###########################################################################
