@@ -30,11 +30,11 @@ const my %encryption_method => (
 	rijndael_128 => [
 		{
 			class  => [qw(Crypt::Rijndael)],
-			method => sub { shift->_validate_rijndael_128->_rijndael_128_encrypt(@_) },
+			method => sub { shift->_need_password->_rijndael_128_encrypt(@_) },
 		},
 		{
 			class  => [qw(Mcrypt)],
-			method => sub { shift->_validate_rijndael_128->_mcrypt_encrypt(@_, 'rijndael-128') },
+			method => sub { shift->_need_password->_mcrypt_encrypt(@_, 'rijndael-128') },
 		},
 	],
 	xor => [{method => \&_xor_encrypt}],
@@ -131,6 +131,15 @@ sub _mcrypt_encrypt {
 
 	return $encrypted_stream;
 }
+sub _need_password {
+	my ($self) = @_;
+
+	if (!$self->has_password) {
+		Moose->throw_error('A password must be provided to use TLS');
+	}
+
+	return $self;
+}
 sub _rijndael_128_encrypt {
 	my ($self, $byte_stream, $iv) = @_;
 
@@ -155,11 +164,6 @@ sub _rijndael_128_encrypt {
 	} split qr{}msx, $byte_stream;
 
 	return $encrypted_stream;
-}
-sub _validate_rijndael_128 {
-	my ($self) = @_;
-
-	return $self;
 }
 sub _xor_encrypt {
 	my ($self, $byte_stream, $iv) = @_;
