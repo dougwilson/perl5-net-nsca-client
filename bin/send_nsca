@@ -14,27 +14,12 @@ our $VERSION   = '0.007';
 use Carp qw(confess);
 use Const::Fast qw(const);
 use English qw(-no_match_vars);
-use Getopt::Long 2.33 qw(:config auto_help auto_version);
+use Getopt::Long 2.33 ();
 use Net::NSCA::Client 0.001;
 use Pod::Usage 1.36;
 
 ###########################################################################
-# PRIVATE VARIABLES
-my $configuration_file;
-my $input_delimiter = "\t";
-my $nsca_hostname   = 'localhost';
-my $nsca_port       = $Net::NSCA::Client::DEFAULT_PORT;
-my $nsca_timeout    = $Net::NSCA::Client::DEFAULT_TIMEOUT;
-
-###########################################################################
 # PRIVATE CONSTANTS
-const my %COMMAND_LINE_CONFIG => (
-	'c=s'  => \$configuration_file,
-	'd=s'  => \$input_delimiter,
-	'H=s'  => \$nsca_hostname,
-	'p=i'  => \$nsca_port,
-	'to=i' => \$nsca_timeout,
-);
 const my %ENCRYPTION_METHOD => (
 	0 => 'none',
 	1 => 'xor',
@@ -44,47 +29,67 @@ const my $EXIT_FAILURE => 3;
 const my $INPUT_FIELD_COUNT => 4;
 
 ###########################################################################
-# PROCESS COMMAND LINE ARGUMENTS
-if (!GetOptions(%COMMAND_LINE_CONFIG)) {
-	# The GetOptions command failed and so return the UNKNOWN state
-	exit $EXIT_FAILURE;
-}
+# RUN PROGRAM
+exit run();
 
-###########################################################################
-# CREATE NSCA CLIENT
-my $nsca = Net::NSCA::Client->new(
-	remote_host => $nsca_hostname,
-	remote_port => $nsca_port,
-	timeout     => $nsca_timeout,
-);
+sub run {
+	# Variables to hold configuration
+	my $configuration_file;
+	my $input_delimiter = "\t";
+	my $nsca_hostname   = 'localhost';
+	my $nsca_port       = $Net::NSCA::Client::DEFAULT_PORT;
+	my $nsca_timeout    = $Net::NSCA::Client::DEFAULT_TIMEOUT;
 
-###########################################################################
-# READ CONFIGURATION FILE
-if (defined $configuration_file) {
-	# Get the password and encryption method from the configuration file
-	my ($password, $encryption_method) = _read_configuration_file($configuration_file);
+	# Make a command line parser
+	my $args_parser = Getopt::Long::Parser->new(config => [qw(
+		auto_help auto_version
+	)]);
 
-	if ($encryption_method ne 'none') {
-		# Set the password and encryption method on the client
-		$nsca->encryption_password($password);
-		$nsca->encryption_type($encryption_method);
+	# Argument specification
+	my @arg_spec = (
+		'c=s'  => \$configuration_file,
+		'd=s'  => \$input_delimiter,
+		'H=s'  => \$nsca_hostname,
+		'p=i'  => \$nsca_port,
+		'to=i' => \$nsca_timeout,
+	);
+
+	# Parse the arguments
+	if (!$args_parser->getoptions(@arg_spec)) {
+		# Parsing the arguments failed for some reason
+		exit $EXIT_FAILURE;
 	}
+
+	# Create the client
+	my $nsca = Net::NSCA::Client->new(
+		remote_host => $nsca_hostname,
+		remote_port => $nsca_port,
+		timeout     => $nsca_timeout,
+	);
+
+	# Read the configuration file
+	if (defined $configuration_file) {
+		# Get the password and encryption method from the configuration file
+		my ($password, $encryption_method) = _read_configuration_file($configuration_file);
+
+		if ($encryption_method ne 'none') {
+			# Set the password and encryption method on the client
+			$nsca->encryption_password($password);
+			$nsca->encryption_type($encryption_method);
+		}
+	}
+
+	# Read from STDIN (or files)
+	chomp(my $line = <>);
+
+	# Send the report
+	$nsca->send_report(_parse_line_to_send_report_options(
+		$line,
+		input_delimiter => $input_delimiter
+	));
+
+	return $EXIT_SUCCESS;
 }
-
-###########################################################################
-# READ FROM STDIN
-chomp(my $line = <>);
-
-###########################################################################
-# SEND REPORT
-$nsca->send_report(_parse_line_to_send_report_options(
-	$line,
-	input_delimiter => $input_delimiter
-));
-
-###########################################################################
-# EXIT
-exit $EXIT_SUCCESS;
 
 ###########################################################################
 # PRIVATE FUNCTIONS
