@@ -97,7 +97,7 @@ sub _read_configuration_file {
 	my ($file_name) = @_;
 
 	# Open the file for reading
-	open my $file, $file_name, 'r'
+	open my $file, '<', $file_name
 		or confess sprintf 'Unable to open configuation file %s: %s',
 			$file_name, $ERRNO;
 
