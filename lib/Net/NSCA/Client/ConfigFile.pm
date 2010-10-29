@@ -25,6 +25,7 @@ const my %CONFIG_VARIABLE_VALUE => (
 	encryption_method => \&_encryption_method_from_number,
 	password          => \&_untaint_password,
 );
+## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 const my %ENCRYPTION_METHOD => (
 	0  => undef,
 	1  => 'xor',
