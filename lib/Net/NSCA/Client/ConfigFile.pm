@@ -27,7 +27,7 @@ const my %CONFIG_VARIABLE_VALUE => (
 );
 ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 const my %ENCRYPTION_METHOD => (
-	0  => undef,
+	0  => 'none',
 	1  => 'xor',
 	2  => 'des',
 	3  => 'triple_des',
@@ -123,11 +123,6 @@ sub parse_send_nsca_config {
 		$config{$name} = $value;
 	}
 
-	if (exists $config{encryption_method} && !defined $config{encryption_method}) {
-		# Special-case for the encryption_method being none
-		delete @config{qw[encryption_method password]};
-	}
-
 	return \%config;
 }
 
@@ -201,8 +196,7 @@ as-is.
 =back
 
 The function returns a hash reference with the keys as the variable names
-and the values as their values. When no C<encryption_method> is specified,
-any C<password> will be removed.
+and the values as their values.
 
 It is important to note that when running under taint mode, the password
 value will be untainted.

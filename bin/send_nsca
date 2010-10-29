@@ -115,7 +115,7 @@ sub _read_configuration_file {
 		? $config->{encryption_method} : 'none';
 
 	# Return the password and encryption method
-	return ($config->{password}, $encryption_method);
+	return @{$config}{qw[password encryption_method]};
 }
 
 sub _parse_line_to_send_report_options {

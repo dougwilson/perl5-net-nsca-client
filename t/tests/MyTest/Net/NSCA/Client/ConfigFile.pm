@@ -63,7 +63,7 @@ password=number1
 encryption_method=0
 
 __[ no_encryption_config_result ]__
-{}
+{encryption_method => 'none', password => 'number1'}
 
 __[ no_name_config ]__
 password=test
