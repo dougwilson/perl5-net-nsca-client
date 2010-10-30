@@ -16,7 +16,7 @@ use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
 # MOOSE TYPES
-use Net::NSCA::Client::Library qw(InitializationVector);
+use Net::NSCA::Client::Library qw(Bytes InitializationVector);
 
 ###############################################################################
 # MODULES
@@ -43,10 +43,11 @@ has initialization_vector => (
 );
 has raw_packet => (
 	is  => 'ro',
-	isa => 'Str',
+	isa => Bytes,
 
 	lazy    => 1,
 	builder => '_build_raw_packet',
+	coerce  => 1,
 );
 has server_config => (
 	is  => 'ro',
@@ -79,7 +80,10 @@ around BUILDARGS => sub {
 		# The packet was provided to the constructor
 		$args = {
 			%{$args}, # Given arguments
-			_constructor_options_from_string($args->{raw_packet}, $args->{server_config})
+			_constructor_options_from_string(
+				to_Bytes($args->{raw_packet}),
+				$args->{server_config},
+			)
 		};
 	}
 

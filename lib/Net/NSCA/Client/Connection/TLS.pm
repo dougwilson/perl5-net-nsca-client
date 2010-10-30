@@ -15,6 +15,10 @@ use Moose 0.89;
 use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
+# MOOSE TYPES
+use Net::NSCA::Client::Library qw(Bytes);
+
+###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
 use namespace::clean 0.04 -except => [qw(meta)];
 
@@ -28,9 +32,10 @@ has encryption_type => (
 );
 has password => (
 	is  => 'rw',
-	isa => 'Str',
+	isa => Bytes,
 
 	clearer   => 'clear_password',
+	coerce    => 1,
 	predicate => 'has_password',
 );
 
@@ -193,6 +198,8 @@ B<TODO: Write this>
 =item * L<Moose|Moose> 0.89
 
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
+
+=item * L<Net::NSCA::Client::Library|Net::NSCA::Client::Library>
 
 =item * L<namespace::clean|namespace::clean> 0.04
 

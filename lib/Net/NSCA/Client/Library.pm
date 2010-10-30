@@ -12,6 +12,7 @@ our $VERSION   = '0.008';
 ###############################################################################
 # MOOSE TYPE DECLARATIONS
 use MooseX::Types 0.08 -declare => [qw(
+	Bytes
 	Hostname
 	InitializationVector
 	Timeout
@@ -37,6 +38,15 @@ const my $INITIALIZATION_VECTOR_LENGTH => 128;
 
 ###############################################################################
 # TYPE DEFINITIONS
+subtype Bytes,
+	as Str,
+	where { !utf8::is_utf8($_) },
+	message { 'Cannot have internal utf8 flag on' };
+
+coerce Bytes,
+	from Str,
+		via { _turn_off_utf8($_) };
+
 subtype Hostname,
 	as Str,
 	where { Data::Validate::Domain::is_hostname($_) },
@@ -76,6 +86,15 @@ sub _add_external_type {
 
 	return;
 }
+sub _turn_off_utf8 {
+	my ($str) = @_;
+
+	if (utf8::is_utf8($str)) {
+		utf8::encode($str);
+	}
+
+	return $str;
+}
 
 1;
 
@@ -107,6 +126,12 @@ distributions.
 No methods.
 
 =head1 TYPES PROVIDED
+
+=head2 Bytes
+
+This requires a string that does not have the internal UTF-8 flag enabled
+(because that means it is not a byte sequence). This provides a coercion to
+change the string into the UTF-8 byte sequence.
 
 =head2 Hostname
 
