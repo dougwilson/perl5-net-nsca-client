@@ -14,13 +14,13 @@ our $VERSION   = '0.008';
 use MooseX::Types 0.08 -declare => [qw(
 	Hostname
 	InitializationVector
-	PortNumber
 	Timeout
 )];
 
 ###############################################################################
 # MOOSE TYPES
 use MooseX::Types::Moose qw(Int Str);
+use MooseX::Types::PortNumber qw(PortNumber);
 
 ###############################################################################
 # MODULES
@@ -33,9 +33,7 @@ use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
 # CONSTANTS
-const my $HIGHEST_PORT_NUMBER          => 65_535;
 const my $INITIALIZATION_VECTOR_LENGTH => 128;
-const my $LOWEST_PORT_NUMBER           => 0;
 
 ###############################################################################
 # TYPE DEFINITIONS
@@ -53,15 +51,31 @@ coerce InitializationVector,
 	from Str,
 		via { substr($_, 0, $INITIALIZATION_VECTOR_LENGTH) . "\0"x($INITIALIZATION_VECTOR_LENGTH - length) };
 
-subtype PortNumber,
-	as Int,
-	where { $_ >= $LOWEST_PORT_NUMBER && $_ <= $HIGHEST_PORT_NUMBER },
-	message { "PortNumber must be between $LOWEST_PORT_NUMBER and $HIGHEST_PORT_NUMBER inclusive" };
-
 subtype Timeout,
 	as Int,
 	where { $_ > 0 },
 	message { 'Timeout must be greater than 0' };
+
+# Add external types as types from this package
+_add_external_type(
+	PortNumber => PortNumber,
+);
+
+###############################################################################
+# PRIVATE FUNCTIONS
+sub _add_external_type {
+	my (%pairs) = @_;
+
+	TYPE:
+	for my $name (keys %pairs) {
+		# Add an entry to the type_storage where the key is simply the name
+		# of the type (a simple string) and the value is the string of the
+		# type location.
+		__PACKAGE__->type_storage->{$name} = "$pairs{$name}";
+	}
+
+	return;
+}
 
 1;
 
@@ -107,7 +121,8 @@ is padded with trailing zeros. Coerces from a Str by chopping or padding to
 
 =head2 PortNumber
 
-This is the type for a port number in TCP and UDP.
+This type is exactly the same as the type C<PortNumber> from
+L<MooseX::Types::PortNumber|MooseX::Types::PortNumber>.
 
 =head1 DEPENDENCIES
 
@@ -122,6 +137,8 @@ This module is dependent on the following modules:
 =item * L<MooseX::Types|MooseX::Types> 0.08
 
 =item * L<MooseX::Types::Moose|MooseX::Types::Moose>
+
+=item * L<MooseX::Types::PortNumber|MooseX::Types::PortNumber>
 
 =item * L<namespace::clean|namespace::clean> 0.04
 
