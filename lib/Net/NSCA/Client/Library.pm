@@ -14,7 +14,6 @@ our $VERSION   = '0.008';
 use MooseX::Types 0.08 -declare => [qw(
 	Bytes
 	Hostname
-	InitializationVector
 	Timeout
 )];
 
@@ -25,16 +24,11 @@ use MooseX::Types::PortNumber qw(PortNumber);
 
 ###############################################################################
 # MODULES
-use Const::Fast qw(const);
 use Data::Validate::Domain 0.02;
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
 use namespace::clean 0.04 -except => [qw(meta)];
-
-###############################################################################
-# CONSTANTS
-const my $INITIALIZATION_VECTOR_LENGTH => 128;
 
 ###############################################################################
 # TYPE DEFINITIONS
@@ -51,15 +45,6 @@ subtype Hostname,
 	as Str,
 	where { Data::Validate::Domain::is_hostname($_) },
 	message { 'Must be a valid hostname' };
-
-subtype InitializationVector,
-	as Str,
-	where { $INITIALIZATION_VECTOR_LENGTH == length },
-	message { 'InitializationVector must be 128 bytes' };
-
-coerce InitializationVector,
-	from Str,
-		via { substr($_, 0, $INITIALIZATION_VECTOR_LENGTH) . "\0"x($INITIALIZATION_VECTOR_LENGTH - length) };
 
 subtype Timeout,
 	as Int,
@@ -110,10 +95,9 @@ This documentation refers to version 0.008
 
 =head1 SYNOPSIS
 
-  use Net::NSCA::Client::Library qw(InitializationVector);
-  # This will import InitializationVector type into your namespace as well as
-  # some helpers like to_InitializationVector and is_InitializationVector. See
-  # MooseX::Types for more information.
+  use Net::NSCA::Client::Library qw(Bytes);
+  # This will import Bytes type into your namespace as well as some helpers
+  # like to_Bytes and is_Bytes. See MooseX::Types for more information.
 
 =head1 DESCRIPTION
 
@@ -139,12 +123,6 @@ This specifies a hostname. This is validated using the
 L<Data::Validate::Domain|Data::Validate::Domain> library with the
 C<is_hostname> function.
 
-=head2 InitializationVector
-
-This is the type for the initialization vector. This is a 128 byte string that
-is padded with trailing zeros. Coerces from a Str by chopping or padding to
-128 bytes.
-
 =head2 PortNumber
 
 This type is exactly the same as the type C<PortNumber> from
@@ -155,8 +133,6 @@ L<MooseX::Types::PortNumber|MooseX::Types::PortNumber>.
 This module is dependent on the following modules:
 
 =over 4
-
-=item * L<Const::Fast|Const::Fast>
 
 =item * L<Data::Validate::Domain|Data::Validate::Domain> 0.02
 

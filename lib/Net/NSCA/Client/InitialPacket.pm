@@ -16,7 +16,7 @@ use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
 # MOOSE TYPES
-use Net::NSCA::Client::Library qw(Bytes InitializationVector);
+use Net::NSCA::Client::Library qw(Bytes);
 
 ###############################################################################
 # MODULES
@@ -36,10 +36,11 @@ __PACKAGE__->meta->add_package_symbol(q{&(""} => sub { shift->raw_packet });
 # ATTRIBUTES
 has initialization_vector => (
 	is  => 'ro',
-	isa => InitializationVector,
+	isa => Bytes,
 
 	builder => '_build_initialization_vector',
 	coerce  => 1,
+	lazy    => 1,
 );
 has raw_packet => (
 	is  => 'ro',
@@ -64,6 +65,17 @@ has unix_timestamp => (
 
 ###############################################################################
 # CONSTRUCTOR
+sub BUILD {
+	my ($self) = @_;
+
+	# Check length of initialization_vector
+	if ($self->server_config->initialization_vector_length
+	    != length $self->initialization_vector) {
+		Moose->throw_error('initialization_vector is not the correct size');
+	}
+
+	return;
+}
 around BUILDARGS => sub {
 	my ($original_method, $class, @args) = @_;
 
