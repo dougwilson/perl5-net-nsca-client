@@ -99,7 +99,8 @@ This documentation refers to version 0.008
 =head1 DESCRIPTION
 
 This module provides types for L<Net::NSCA::Client|Net::NSCA::Client> and
-family.
+family. This type library is not intended to be used my module in other
+distributions.
 
 =head1 METHODS
 
