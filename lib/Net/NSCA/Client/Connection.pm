@@ -148,8 +148,13 @@ sub _build_initial_packet {
 
 	# Read the bytes
 	## no critic (Subroutines::ProtectPrivateSubs)
-	$self->socket->sysread($received_bytes,
+	my $recv = $self->socket->sysread($received_bytes,
 		$self->server_config->_c_packer->sizeof('init_packet_struct'));
+
+	if ($recv == 0) {
+		# Reached EOF
+		Moose->throw_error('Remote host terminated connection');
+	}
 
 	# Create the initial packet object
 	my $initial_packet = Net::NSCA::Client::InitialPacket->new(
