@@ -89,11 +89,15 @@ sub encrypt {
 			$encrypt = $method->{method};
 		}
 		catch {
-			# Record only the first error
-			$error = $_ if !defined $error;
+			if (!defined $error) {
+				# Record only the first error
+				$error = $_;
+			}
 		};
 
-		last METHOD if defined $encrypt;
+		if (defined $encrypt) {
+			last METHOD;
+		}
 	}
 
 	if (!defined $encrypt) {
@@ -152,16 +156,20 @@ sub _rijndael_128_encrypt {
 	# Set the register to the IV
 	my $register = _pad_string($iv, $cipher->blocksize);
 
-	# Encrypt the byte stream
-	my $encrypted_stream = join q{}, map {
+	# Subroutine to encrypt a single byte
+	my $byte_encrypt = sub {
 		my $out = $cipher->encrypt($register);
 
-		my $byte = $_ ^ substr $out, 0, 1;
+		my $byte = $_[0] ^ substr $out, 0, 1;
 
 		$register = substr($register, 1) . $byte;
 
-		$byte;
-	} split qr{}msx, $byte_stream;
+		return $byte;
+	};
+
+	# Encrypt the byte stream
+	my $encrypted_stream = join q{}, map { $byte_encrypt->($_) }
+		split qr{}msx, $byte_stream;
 
 	return $encrypted_stream;
 }
@@ -202,7 +210,7 @@ sub _pad_string {
 	}
 	elsif ($to_length > length $string) {
 		# Pad with NULL
-		$string .= "\x00" x ($to_length - length $string);
+		$string .= chr(0) x ($to_length - length $string);
 	}
 
 	return $string;
