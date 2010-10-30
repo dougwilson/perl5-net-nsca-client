@@ -2,7 +2,7 @@ exclude  = Miscellanea::RequireRcsKeywords
 severity = 1
 
 [Documentation::PodSpelling]
-stop_words = AnnoCPAN CFB CPAN CPAN's CRC HASHREF hostname InitializationVector IP Nagios NSCA NULLs obfucated octothorpe perldoc PortNumber STDERR Str TCP timestamp TODO UDP XOR'd
+stop_words = AnnoCPAN CFB CPAN CPAN's CRC HASHREF hostname InitializationVector IP Nagios NSCA NULLs obfucated octothorpe perl perldoc plugin PortNumber STDERR Str TCP timestamp TODO UDP XOR'd
 
 [Documentation::RequirePodSections]
 lib_sections    = NAME | VERSION | SYNOPSIS | DESCRIPTION | METHODS | DEPENDENCIES | BUGS AND LIMITATIONS | AUTHOR | LICENSE AND COPYRIGHT
