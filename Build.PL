@@ -28,6 +28,7 @@ my $build = Module::Build->new(
 		'Test::Fatal'     => 0,
 		'Test::More'      => '0.94',
 		'Test::Requires'  => '0.02',
+		'Test::TCP'       => '1.03',
 	},
 
 	# Module that are required

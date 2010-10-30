@@ -10,6 +10,7 @@ build_requires:
   Test::Fatal: 0
   Test::More: 0.94
   Test::Requires: 0.02
+  Test::TCP: 1.03
 configure_requires:
   Module::Build: 0.36
 generated_by: 'Module::Build version 0.3607'
