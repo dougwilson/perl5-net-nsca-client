@@ -89,21 +89,30 @@ sub send_report {
 	my ($hostname, $service, $message, $status) = @args{qw(
 	     hostname   service   message   status)};
 
+	# Copy some attributes for this for the connection
+	my @connection_args = map { $_ => $self->$_ }
+		(qw[remote_host remote_port server_config timeout]);
+
+	if ($self->encryption_type ne 'none') {
+		# Start the TLS object arguments
+		my @tls_args = (
+			encryption_type => $self->encryption_type,
+		);
+
+		if ($self->has_encryption_password) {
+			# Add the password
+			push @tls_args, password => $self->encryption_password;
+		}
+
+		# Create a TLS object for the connection
+		my $tls = Net::NSCA::Client::Connection::TLS->new(@tls_args);
+
+		# Add the TLS object to the connection
+		push @connection_args, transport_layer_security => $tls;
+	}
+
 	# Create a new connection to the remote server
-	my $connection = Net::NSCA::Client::Connection->new(
-		remote_host   => $self->remote_host,
-		remote_port   => $self->remote_port,
-		server_config => $self->server_config,
-		timeout       => $self->timeout,
-
-		($self->encryption_type eq 'none' ? () : (
-			transport_layer_security => Net::NSCA::Client::Connection::TLS->new(
-				encryption_type => $self->encryption_type,
-
-				($self->has_encryption_password ? (password => $self->encryption_password) : ()),
-			)
-		)),
-	);
+	my $connection = Net::NSCA::Client::Connection->new(@connection_args);
 
 	# Create a data packet to send back
 	my $data_packet = Net::NSCA::Client::DataPacket->new(
