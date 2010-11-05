@@ -22,6 +22,7 @@ use Net::NSCA::Client::Library qw(Bytes);
 # MODULES
 use Data::Rand::Obscure 0.020;
 use Net::NSCA::Client::ServerConfig ();
+use Net::NSCA::Client::Utils qw(initialize_moose_attr_early);
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -88,15 +89,17 @@ around BUILDARGS => sub {
 	# Call the original method to get args HASHREF
 	my $args = $class->$original_method(@args);
 
-	if (exists $args->{raw_packet}) {
+	if (defined(my $raw_packet = initialize_moose_attr_early($class, raw_packet => $args))) {
 		# The packet was provided to the constructor
-		$args = {
-			%{$args}, # Given arguments
-			_constructor_options_from_string(
-				to_Bytes($args->{raw_packet}),
-				$args->{server_config},
-			)
-		};
+
+		# Get the server_config as well
+		my $server_config = initialize_moose_attr_early($class, server_config => $args);
+
+		# Build constructor arguments from the raw packet
+		my $new_args = _constructor_options_from_string($raw_packet, $server_config);
+
+		# Merge the arguments together
+		$args = { %{$args}, %{$new_args} };
 	}
 
 	return $args;
@@ -153,10 +156,10 @@ sub _constructor_options_from_string {
 	my $unpacket = $server_config->unpack_initial_packet($packet);
 
 	# Return the options for the constructor
-	return (
+	return {
 		initialization_vector => $unpacket->{iv       },
 		unix_timestamp        => $unpacket->{timestamp},
-	);
+	};
 }
 
 ###############################################################################
