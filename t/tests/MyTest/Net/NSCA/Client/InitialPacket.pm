@@ -18,7 +18,7 @@ sub constructor_new : Tests(4) {
 
 	# Make a HASH of arguments for constructor
 	my %options = (
-		initialization_vector => 'thisisnotagoodiv',
+		unix_timestamp => 1_234_567,
 	);
 
 	# Make sure new exists
@@ -46,18 +46,15 @@ sub attribute_initialization_vector : Tests(3) {
 	# Get a basic packet
 	my $packet = $class->new;
 
-	{
-		no strict 'refs';
-		is length($packet->initialization_vector), 128, 'Default iv is right length';
-	}
+	# Check built IV length
+	is(length($packet->initialization_vector),
+		$packet->server_config->initialization_vector_length,
+		'Default iv is right length');
 
-	# Get a custom packet
-	$packet = $class->new(initialization_vector => 'IamBADiv');
-
-	{
-		no strict 'refs';
-		is length($packet->initialization_vector), 128, 'Custom iv is right length';
-	}
+	# Packet with IV too short
+	like(exception { $class->new(initialization_vector => 'IamBADiv') },
+		qr{initialization_vector is not the correct size},
+		'initialization_vector is not the correct size');
 
 	return;
 }

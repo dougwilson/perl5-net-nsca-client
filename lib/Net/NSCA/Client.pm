@@ -16,7 +16,7 @@ use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
 # MOOSE TYPES
-use Net::NSCA::Client::Library qw(Hostname PortNumber Timeout);
+use Net::NSCA::Client::Library qw(Bytes Hostname PortNumber Timeout);
 
 ###############################################################################
 # MODULES
@@ -44,9 +44,10 @@ const our $STATUS_UNKNOWN  => 3;
 # ATTRIBUTES
 has encryption_password => (
 	is  => 'rw',
-	isa => 'Str',
+	isa => Bytes,
 
 	clearer   => 'clear_encryption_password',
+	coerce    => 1,
 	predicate => 'has_encryption_password',
 );
 has encryption_type => (
