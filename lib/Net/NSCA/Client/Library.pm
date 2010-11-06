@@ -13,13 +13,14 @@ our $VERSION   = '0.009';
 # MOOSE TYPE DECLARATIONS
 use MooseX::Types 0.08 -declare => [qw(
 	Bytes
+	ConfigFile
 	Hostname
 	Timeout
 )];
 
 ###############################################################################
 # MOOSE TYPES
-use MooseX::Types::Moose qw(Int Str);
+use MooseX::Types::Moose qw(HashRef Int Object Str);
 use MooseX::Types::PortNumber qw(PortNumber);
 
 ###############################################################################
@@ -40,6 +41,22 @@ subtype Bytes,
 coerce Bytes,
 	from Str,
 		via { _turn_off_utf8($_) };
+
+subtype ConfigFile,
+	as Object,
+	where { $_->isa('Net::NSCA::Client::ConfigFile') };
+
+coerce ConfigFile,
+	from HashRef,
+		via { _new_config_file($_) };
+
+coerce ConfigFile,
+	from Object,
+		via { _new_config_file(from_io => $_) };
+
+coerce ConfigFile,
+	from Str,
+		via { _new_config_file(from_io => $_) };
 
 subtype Hostname,
 	as Str,
@@ -70,6 +87,12 @@ sub _add_external_type {
 	}
 
 	return;
+}
+sub _new_config_file {
+	# Load the ConfigFile class
+	Class::MOP::load_class('Net::NSCA::Client::ConfigFile');
+
+	return Net::NSCA::Client::ConfigFile->new(@_);
 }
 sub _turn_off_utf8 {
 	my ($str) = @_;

@@ -26,7 +26,7 @@ sub constructor_new : Tests(14) {
 	$config = new_ok $class, [{encryption_password => 'test'}];
 
 	# Constructor from IO
-	$config = new_ok $class, [from_io => $test->_section_io('full_config')];
+	$config = new_ok $class, [from_io => $test->_section_ref('full_config')];
 	ok($config->has_encryption_password, 'Has password from config file');
 	ok($config->has_encryption_method,   'Has encryption method from config file');
 	is($config->encryption_password, 'mysecret', 'Password read from config file');
@@ -92,7 +92,8 @@ sub parse_send_nsca_config : Test(no_plan) {
 		'Unknown encryption method throws expection');
 }
 
-sub _section_io { IO::String->new($_[0]->section_data($_[1])); }
+sub _section_io  { IO::String->new($_[0]->_section_ref($_[1])); }
+sub _section_ref { $_[0]->section_data($_[1]); }
 
 1;
 

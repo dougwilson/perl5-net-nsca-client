@@ -15,6 +15,11 @@ use Moose 0.89;
 use MooseX::StrictConstructor 0.08;
 
 ###########################################################################
+# MOOSE TYPES
+use MooseX::Types::IO qw(IO);
+use Net::NSCA::Client::Library qw(Bytes);
+
+###########################################################################
 # MODULES
 use Const::Fast qw(const);
 use Try::Tiny;
@@ -78,9 +83,10 @@ has encryption_method => (
 );
 has encryption_password => (
 	is  => 'ro',
-	isa => 'Str',
+	isa => Bytes,
 
 	clearer   => '_clear_encryption_password',
+	coerce    => 1,
 	predicate => 'has_encryption_password',
 );
 
@@ -99,7 +105,7 @@ around BUILDARGS => sub {
 		}
 
 		# Remove the IO from the argument list
-		my $io = delete $args->{from_io};
+		my $io = to_IO(delete $args->{from_io});
 
 		# Parse the file
 		my $config = parse_send_nsca_config($io);
@@ -119,6 +125,27 @@ around BUILDARGS => sub {
 
 	return $args;
 };
+
+###########################################################################
+# METHODS
+sub client_new_args {
+	my ($self) = @_;
+
+	# Arguments hash
+	my %args;
+
+	if ($self->has_encryption_method) {
+		# Add encryption type
+		$args{encryption_type} = $self->encryption_method;
+	}
+
+	if ($self->has_encryption_password) {
+		# Add encryption password
+		$args{encryption_password} = $self->encryption_password;
+	}
+
+	return \%args;
+}
 
 ###########################################################################
 # FUNCTIONS
@@ -347,6 +374,15 @@ This returns a Boolean if there is a value in L</encryption_method>.
 
 This returns a Boolean if there is a value in L</encryption_password>.
 
+=head1 METHODS
+
+=head2 client_new_args
+
+This returns a hash reference that is suitable to create a new client
+object with.
+
+  my $client = Net::NSCA::Client->new($config->client_new_args);
+
 =head1 FUNCTIONS
 
 The following are functions and cannot be called as methods of an instance.
@@ -386,6 +422,8 @@ value will be untainted.
 =item * L<Moose|Moose> 0.89
 
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
+
+=item * L<Net::NSCA::Client::Library|Net::NSCA::Client::Library>
 
 =item * L<Try::Tiny|Try::Tiny>
 

@@ -16,7 +16,6 @@ use Const::Fast qw(const);
 use English qw(-no_match_vars);
 use Getopt::Long 2.33 ();
 use Net::NSCA::Client 0.001;
-use Net::NSCA::Client::ConfigFile ();
 use Pod::Usage 1.36;
 
 ###########################################################################
@@ -25,6 +24,7 @@ const my $EXIT_SUCCESS => 0;
 const my $EXIT_FAILURE => 3;
 const my $INPUT_FIELD_COUNT => 4;
 const my %OPTION_AS_NAME => (
+	c  => 'config',
 	H  => 'remote_host',
 	p  => 'remote_port',
 	to => 'timeout',
@@ -36,7 +36,6 @@ exit run();
 
 sub run {
 	# Variables to hold configuration
-	my $configuration_file;
 	my $input_delimiter = "\t";
 
 	# Make a command line parser
@@ -46,7 +45,7 @@ sub run {
 
 	# Argument specification
 	my @arg_spec = (
-		'c=s' => \$configuration_file,
+		'c=s',
 		'd=s' => \$input_delimiter,
 		'H=s',
 		'p=i',
@@ -63,19 +62,6 @@ sub run {
 
 	# Construct the client arguments from the command line options
 	my @client_args = map { $OPTION_AS_NAME{$_} => $args{$_} } keys %args;
-
-	# Read the configuration file
-	if (defined $configuration_file) {
-		# Get the password and encryption method from the configuration file
-		my ($password, $encryption_method) = _read_configuration_file($configuration_file);
-
-		if ($encryption_method ne 'none') {
-			# Set the password and encryption method on the client
-			push @client_args,
-				encryption_password => $password,
-				encryption_type     => $encryption_method;
-		}
-	}
 
 	# Create the client
 	my $nsca = Net::NSCA::Client->new(@client_args);
@@ -94,30 +80,6 @@ sub run {
 
 ###########################################################################
 # PRIVATE FUNCTIONS
-sub _read_configuration_file {
-	my ($file_name) = @_;
-
-	# Open the file for reading
-	open my $file, '<', $file_name
-		or confess sprintf 'Unable to open configuation file %s: %s',
-			$file_name, $ERRNO;
-
-	# Read the configuration file
-	my $config = Net::NSCA::Client::ConfigFile::parse_send_nsca_config($file);
-
-	# Close the file
-	close $file
-		or confess sprintf 'Unable to close %s: %s',
-			$file_name, $ERRNO;
-
-	# Get the encryption method
-	my $encryption_method = defined $config->{encryption_method}
-		? $config->{encryption_method} : 'none';
-
-	# Return the password and encryption method
-	return @{$config}{qw[password encryption_method]};
-}
-
 sub _parse_line_to_send_report_options {
 	my ($line, %args) = @_;
 

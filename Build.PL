@@ -47,6 +47,7 @@ my $build = Module::Build->new(
 		'MooseX::Clone'             => 0,
 		'MooseX::StrictConstructor' => '0.08',
 		'MooseX::Types'             => '0.08',
+		'MooseX::Types::IO'         => 0,
 		'MooseX::Types::PortNumber' => 0,
 		'namespace::clean'          => '0.04',
 	},

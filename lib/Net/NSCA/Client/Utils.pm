@@ -42,6 +42,9 @@ sub initialize_moose_attr_early {
 	# Make sure it is a valid value
 	$attr->verify_against_type_constraint($value, instance => $class->meta);
 
+	# Set new value to the now-coerced value
+	$args->{$attr->init_arg} = $value;
+
 	return $value;
 }
 
