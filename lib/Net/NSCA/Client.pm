@@ -261,11 +261,28 @@ C<$STATUS_*> constants.
 
 =head1 SPECIFICATION
 
+The NSCA protocol is currently at L<version 3|/NSCA PROTOCOL 3>. Simply
+put, the NSCA protocol is very simple from the perspective for the C
+language. The NSCA program has a C structure that is populated and then
+sent across the network in raw form.
+
+=head2 NSCA PROTOCOL 1
+
+Currently I cannot find any information on this (it is probably ancient; at
+least before 2002). This module does not support this protocol version.
+
+=head2 NSCA PROTOCOL 2
+
+This protocol is identical to L</NSCA PROTOCOL 3> except that the
+C<packet_version> is the integer C<2> to match the protocol version. The
+difference between the two protocols is that with version 3, passive host
+checks were introduced and thus the version had to change otherwise the
+server would think that the check was for a service with no name.
+
 =head2 NSCA PROTOCOL 3
 
-The NSCA protocol is currently at version 3. Simply put, the NSCA protocol is
-very simple from the perspective for the C language. The NSCA program has a
-C structure that is populated and then sent across the network in raw form.
+This protocol version was first introduced in NSCA version 2.2.
+
 Below is the definition of the C structure taken from C<common.h> in NSCA
 version 2.7.2.
 
@@ -314,8 +331,9 @@ followed by the IV are followed for the password (byte-per-byte, looping).
 
 =head4 All other Encryptions
 
-All other specified encryption methods are performed in cipher feedback (CFB)
-mode, at one byte.
+All other specified encryption methods are performed in cipher feedback
+(CFB) mode, in one bye blocks (even if the encryption method doesn't
+actually support being used in one byte block modes.
 
 =head1 CONSTANTS
 
