@@ -26,7 +26,7 @@ use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
 # OVERLOADED FUNCTIONS
-__PACKAGE__->meta->add_package_symbol(q{&()}    => sub { });
+__PACKAGE__->meta->add_package_symbol(q{&()}  => sub { });
 __PACKAGE__->meta->add_package_symbol(q{&(==} => sub {  $_[0]->is_compatible_with($_[1]) });
 __PACKAGE__->meta->add_package_symbol(q{&(!=} => sub { !$_[0]->is_compatible_with($_[1]) });
 
