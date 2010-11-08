@@ -130,6 +130,30 @@ sub send_report {
 	# Nothing good to return, so return self
 	return $self;
 }
+sub send_host_report {
+	my ($self, %args) = @_;
+
+	# Splice out the arguments
+	my ($hostname, $message, $status) = @args{qw(
+	     hostname   message   status)};
+
+	if ($self->server_config->packet_version < 3) {
+		# Only packet version 3 (and up?) support host check reports
+		Moose->throw_error(sprintf
+			'To send host reports, the sever needs to accept version 3 packets; the server supports version %d packets',
+			$self->server_config->packet_version
+		);
+	}
+
+	# Send the report
+	return $self->send_report(
+		hostname => $hostname,
+		message  => $message,
+		status   => $status,
+		# For host reports, service is an empty string
+		service  => q{},
+	);
+}
 
 ###############################################################################
 # MAKE MOOSE OBJECT IMMUTABLE
@@ -249,6 +273,19 @@ This is the hostname of the service that is being reported.
 =head3 service
 
 This is the service description of the service that is being reported.
+
+=head3 message
+
+This is the message that the plug in gives to Nagios.
+
+=head2 send_host_report
+
+This will send a report on a host to the remote NSCA server. This method
+takes a HASH of arguments with the following keys:
+
+=head3 hostname
+
+This is the hostname of the service that is being reported.
 
 =head3 message
 
