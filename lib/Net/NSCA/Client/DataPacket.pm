@@ -49,8 +49,9 @@ has packet_version => (
 	is  => 'ro',
 	isa => 'Int',
 
-	default       => 3,
+	builder       => '_build_packet_version',
 	documentation => q{The version of the packet being transmitted},
+	lazy          => 1,
 );
 has raw_packet => (
 	is  => 'ro',
@@ -130,6 +131,11 @@ sub to_string {
 
 ###############################################################################
 # PRIVATE METHODS
+sub _build_packet_version { ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+	my ($self) = @_;
+
+	return $self->server_config->packet_version;
+}
 sub _build_raw_packet {
 	my ($self) = @_;
 
@@ -291,7 +297,8 @@ belongs to.
 
 This is the version of the packet to be sent. A few different NSCA servers use
 slightly different version numbers, but the rest of the packet is the same.
-If not specified, this will default to 3.
+If not specified, this will default to the version set in the supplied (or
+default) L</server_config>.
 
 =head2 raw_packet
 

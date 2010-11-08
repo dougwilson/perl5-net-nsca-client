@@ -61,6 +61,12 @@ has max_service_message_length => (
 
 	default => 512,
 );
+has packet_version => (
+	is  => 'ro',
+	isa => 'Int',
+
+	default => 3,
+);
 
 ###############################################################################
 # PRIVATE ATTRIBUTES
@@ -84,6 +90,7 @@ sub is_compatible_with {
 		max_description_length
 		max_hostname_length
 		max_service_message_length
+		packet_version
 	]);
 
 	# Compatible if all attributes are equal
@@ -421,6 +428,11 @@ the C<MAX_HOSTNAME_LENGTH> constant in F<common.h>.
 
 This specifies the maximum service message (plugin output) length in bytes
 as specified in the C<MAX_PLUGINOUTPUT_LENGTH> constant in F<common.h>.
+
+=head2 packet_version
+
+This specified what packet version the server is expecting. Currently only
+C<2> and C<3> are supported.
 
 =head1 METHODS
 
