@@ -185,8 +185,8 @@ This documentation refers to version 0.008
 
   # Create a packet from scratch
   my $packet = Net::NSCA::Client::InitialPacket->new(
-    initialization_vector => $iv,
-    unix_timestamp        => time(),
+      initialization_vector => $iv,
+      unix_timestamp        => time(),
   );
 
   # Create a packet recieved from over the network
@@ -224,9 +224,6 @@ C<$packet_string> is a string of the data packet in the network form.
 =back
 
 =head1 ATTRIBUTES
-
-  # Set an attribute
-  $object->attribute_name($new_value);
 
   # Get an attribute
   my $value = $object->attribute_name;

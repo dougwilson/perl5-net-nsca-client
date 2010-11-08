@@ -210,8 +210,8 @@ This documentation refers to version 0.008
 
   # Create a new connection
   my $connection = Net::NSCA::Client::Connection->new(
-    remote_host => 'nagios.example.net',
-    remote_port => $nsca_port,
+      remote_host => 'nagios.example.net',
+      remote_port => $nsca_port,
   );
 
   # Send a packet
