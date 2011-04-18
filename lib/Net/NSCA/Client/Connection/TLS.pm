@@ -320,9 +320,13 @@ B<TODO: Write this>
 
 =over
 
+=item * L<Class::MOP|Class::MOP>
+
 =item * L<Moose|Moose> 0.89
 
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
+
+=item * L<Try::Tiny|Try::Tiny>
 
 =item * L<namespace::clean|namespace::clean> 0.04
 
