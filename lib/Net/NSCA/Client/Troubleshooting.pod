@@ -35,6 +35,13 @@ NSCA, you will need to setup the client to use the same constant values.
 See L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig> on
 how to change these constants for the client.
 
+=head3 NSCA server compiled on non-32-bit machine
+
+If the NSCA server was compiled on a machine that has a C data structure
+alignment that is not 4 bytes (which is common on 32-bit machines), then
+the structure of the data packet the client generates is wrong. The
+alignment can be changed using L<Net::NSCA::Client::ServerConfig/alignment>.
+
 =head2 Data sent from client was too short
 
 This message indicates that the data packet the client is sending to the
