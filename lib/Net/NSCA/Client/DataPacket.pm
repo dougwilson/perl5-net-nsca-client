@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 ###############################################################################
 # MOOSE
@@ -20,7 +20,7 @@ with 'MooseX::Clone';
 
 ###############################################################################
 # MOOSE TYPES
-use Net::NSCA::Client::Library qw(Bytes);
+use Net::NSCA::Client::Library 0.009 qw(Bytes);
 
 ###############################################################################
 # MODULES
@@ -220,7 +220,7 @@ Net::NSCA::Client::DataPacket - Implements data packet for the NSCA protocol
 
 =head1 VERSION
 
-This documentation refers to version 0.008
+This documentation refers to version 0.009
 
 =head1 SYNOPSIS
 

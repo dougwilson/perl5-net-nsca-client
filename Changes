@@ -1,7 +1,7 @@
 Revision history for Net-NSCA-Client
 ====================================
 
-TO BE RELEASED
+0.009 2011-05-02
   * FIX: An attribute was missing the lazy attribute and Moose 2.00
     caused this to make the tests failed. Added the lazy attribute.
   * FIX: When the `initialization_vector_length` is changed in ServerConfig

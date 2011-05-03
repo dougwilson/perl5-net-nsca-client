@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 ###############################################################################
 # MOOSE
@@ -334,7 +334,7 @@ NSCA server
 
 =head1 VERSION
 
-This documentation refers to version 0.008
+This documentation refers to version 0.009
 
 =head1 SYNOPSIS
 

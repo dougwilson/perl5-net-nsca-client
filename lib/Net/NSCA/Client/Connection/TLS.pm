@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 ###############################################################################
 # MOOSE
@@ -16,7 +16,7 @@ use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
 # MOOSE TYPES
-use Net::NSCA::Client::Library qw(Bytes);
+use Net::NSCA::Client::Library 0.009 qw(Bytes);
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -106,7 +106,7 @@ a connection.
 
 =head1 VERSION
 
-This documentation refers to version 0.008
+This documentation refers to version 0.009
 
 =head1 SYNOPSIS
 
