@@ -13,7 +13,7 @@ build_requires:
   Test::TCP: 1.03
 configure_requires:
   Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+generated_by: 'Module::Build version 0.3603'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,25 +27,28 @@ no_index:
 provides:
   Net::NSCA::Client:
     file: lib/Net/NSCA/Client.pm
-    version: 0.008
+    version: 0.009
   Net::NSCA::Client::Connection:
     file: lib/Net/NSCA/Client/Connection.pm
-    version: 0.008
+    version: 0.009
   Net::NSCA::Client::Connection::TLS:
     file: lib/Net/NSCA/Client/Connection/TLS.pm
-    version: 0.008
+    version: 0.009
   Net::NSCA::Client::DataPacket:
     file: lib/Net/NSCA/Client/DataPacket.pm
-    version: 0.008
+    version: 0.009
   Net::NSCA::Client::InitialPacket:
     file: lib/Net/NSCA/Client/InitialPacket.pm
-    version: 0.008
+    version: 0.009
   Net::NSCA::Client::Library:
     file: lib/Net/NSCA/Client/Library.pm
-    version: 0.008
+    version: 0.009
   Net::NSCA::Client::ServerConfig:
     file: lib/Net/NSCA/Client/ServerConfig.pm
-    version: 0.008
+    version: 0.009
+  Net::NSCA::Client::Utils:
+    file: lib/Net/NSCA/Client/Utils.pm
+    version: 0.009
 requires:
   Const::Fast: 0
   Convert::Binary::C: 0.74
@@ -66,4 +69,4 @@ resources:
   homepage: http://github.com/dougwilson/perl5-net-nsca-client/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/dougwilson/perl5-net-nsca-client.git
-version: 0.008
+version: 0.009

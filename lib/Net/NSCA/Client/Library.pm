@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 ###############################################################################
 # MOOSE TYPE DECLARATIONS
@@ -91,7 +91,7 @@ Net::NSCA::Client::Library - Types library
 
 =head1 VERSION
 
-This documentation refers to version 0.008
+This documentation refers to version 0.009
 
 =head1 SYNOPSIS
 
@@ -112,6 +112,8 @@ No methods.
 =head1 TYPES PROVIDED
 
 =head2 Bytes
+
+B<Added in version 0.009>; be sure to require this version for this feature.
 
 This requires a string that does not have the internal UTF-8 flag enabled
 (because that means it is not a byte sequence). This provides a coercion to
