@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 ###############################################################################
 # MOOSE
@@ -16,13 +16,13 @@ use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
 # MOOSE TYPES
-use Net::NSCA::Client::Library qw(InitializationVector);
+use Net::NSCA::Client::Library 0.009 qw(Bytes);
 
 ###############################################################################
 # MODULES
 use Data::Rand::Obscure 0.020;
 use Net::NSCA::Client::ServerConfig ();
-use Readonly 1.03;
+use Net::NSCA::Client::Utils qw(initialize_moose_attr_early);
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -34,25 +34,22 @@ __PACKAGE__->meta->add_package_symbol(q{&()}  => sub {                   });
 __PACKAGE__->meta->add_package_symbol(q{&(""} => sub { shift->raw_packet });
 
 ###############################################################################
-# PRIVATE CONSTANTS
-Readonly my $BYTES_FOR_16BITS => 2;
-Readonly my $BYTES_FOR_32BITS => 4;
-
-###############################################################################
 # ATTRIBUTES
 has initialization_vector => (
 	is  => 'ro',
-	isa => InitializationVector,
+	isa => Bytes,
 
 	builder => '_build_initialization_vector',
 	coerce  => 1,
+	lazy    => 1,
 );
 has raw_packet => (
 	is  => 'ro',
-	isa => 'Str',
+	isa => Bytes,
 
 	lazy    => 1,
 	builder => '_build_raw_packet',
+	coerce  => 1,
 );
 has server_config => (
 	is  => 'ro',
@@ -69,6 +66,17 @@ has unix_timestamp => (
 
 ###############################################################################
 # CONSTRUCTOR
+sub BUILD {
+	my ($self) = @_;
+
+	# Check length of initialization_vector
+	if ($self->server_config->initialization_vector_length
+	    != length $self->initialization_vector) {
+		Moose->throw_error('initialization_vector is not the correct size');
+	}
+
+	return;
+}
 around BUILDARGS => sub {
 	my ($original_method, $class, @args) = @_;
 
@@ -81,12 +89,17 @@ around BUILDARGS => sub {
 	# Call the original method to get args HASHREF
 	my $args = $class->$original_method(@args);
 
-	if (exists $args->{raw_packet}) {
+	if (defined(my $raw_packet = initialize_moose_attr_early($class, raw_packet => $args))) {
 		# The packet was provided to the constructor
-		$args = {
-			%{$args}, # Given arguments
-			_constructor_options_from_string($args->{raw_packet}, $args->{server_config})
-		};
+
+		# Get the server_config as well
+		my $server_config = initialize_moose_attr_early($class, server_config => $args);
+
+		# Build constructor arguments from the raw packet
+		my $new_args = _constructor_options_from_string($raw_packet, $server_config);
+
+		# Merge the arguments together
+		$args = { %{$args}, %{$new_args} };
 	}
 
 	return $args;
@@ -143,10 +156,10 @@ sub _constructor_options_from_string {
 	my $unpacket = $server_config->unpack_initial_packet($packet);
 
 	# Return the options for the constructor
-	return (
+	return {
 		initialization_vector => $unpacket->{iv       },
 		unix_timestamp        => $unpacket->{timestamp},
-	);
+	};
 }
 
 ###############################################################################
@@ -164,7 +177,7 @@ protocol
 
 =head1 VERSION
 
-This documentation refers to version 0.008
+This documentation refers to version 0.009
 
 =head1 SYNOPSIS
 
@@ -172,8 +185,8 @@ This documentation refers to version 0.008
 
   # Create a packet from scratch
   my $packet = Net::NSCA::Client::InitialPacket->new(
-    initialization_vector => $iv,
-    unix_timestamp        => time(),
+      initialization_vector => $iv,
+      unix_timestamp        => time(),
   );
 
   # Create a packet recieved from over the network
@@ -211,9 +224,6 @@ C<$packet_string> is a string of the data packet in the network form.
 =back
 
 =head1 ATTRIBUTES
-
-  # Set an attribute
-  $object->attribute_name($new_value);
 
   # Get an attribute
   my $value = $object->attribute_name;
@@ -256,8 +266,6 @@ string representation is what will be sent over the network.
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
 
 =item * L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig>
-
-=item * L<Readonly|Readonly> 1.03
 
 =item * L<namespace::clean|namespace::clean> 0.04
 

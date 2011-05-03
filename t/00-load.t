@@ -26,6 +26,7 @@ BEGIN {
 		Net::NSCA::Client::DataPacket
 		Net::NSCA::Client::InitialPacket
 		Net::NSCA::Client::Library
+		Net::NSCA::Client::Utils
 	);
 
 	# Plan tests of the number of modules

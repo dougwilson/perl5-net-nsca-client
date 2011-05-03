@@ -7,12 +7,16 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 ###############################################################################
 # MOOSE
 use Moose 0.89;
 use MooseX::StrictConstructor 0.08;
+
+###############################################################################
+# MOOSE TYPES
+use Net::NSCA::Client::Library 0.009 qw(Bytes);
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -28,9 +32,10 @@ has encryption_type => (
 );
 has password => (
 	is  => 'rw',
-	isa => 'Str',
+	isa => Bytes,
 
 	clearer   => 'clear_password',
+	coerce    => 1,
 	predicate => 'has_password',
 );
 
@@ -101,7 +106,7 @@ a connection.
 
 =head1 VERSION
 
-This documentation refers to version 0.008
+This documentation refers to version 0.009
 
 =head1 SYNOPSIS
 
@@ -193,6 +198,8 @@ B<TODO: Write this>
 =item * L<Moose|Moose> 0.89
 
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
+
+=item * L<Net::NSCA::Client::Library|Net::NSCA::Client::Library>
 
 =item * L<namespace::clean|namespace::clean> 0.04
 

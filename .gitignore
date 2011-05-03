@@ -1,5 +1,6 @@
 _build/
 blib/
+cover_db/
 Build
 Debian_CPANTS.txt
 Makefile

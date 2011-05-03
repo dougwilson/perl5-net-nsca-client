@@ -8,11 +8,14 @@ lib/Net/NSCA/Client/DataPacket.pm
 lib/Net/NSCA/Client/InitialPacket.pm
 lib/Net/NSCA/Client/Library.pm
 lib/Net/NSCA/Client/ServerConfig.pm
+lib/Net/NSCA/Client/Troubleshooting.pod
+lib/Net/NSCA/Client/Utils.pm
 LICENSE
 MANIFEST			This list of files
 META.yml
 README
 t/00-load.t
+t/live_server.t
 t/run.t
 t/send_nsca.t
 t/tests/MyTest/Class.pm

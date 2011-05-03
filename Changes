@@ -1,6 +1,18 @@
 Revision history for Net-NSCA-Client
 ====================================
 
+0.009 2011-05-02
+  * FIX: An attribute was missing the lazy attribute and Moose 2.00
+    caused this to make the tests failed. Added the lazy attribute.
+  * FIX: When the `initialization_vector_length` is changed in ServerConfig
+    the new value is honored.
+  * A specific error message will occur if the remote server disconnects
+    early.
+  * Add a troubleshooting guide.
+  * Change all uses of `Readonly` to `Const::Fast`.
+  * Change all uses of `Test::Exception` to `Test::Fatal`.
+  * Lots of new tests; very close to 100% coverage.
+
 0.008 Mon, August 30, 2010 22:11:22 -0400
   * FIX: Actually sending a report was broken with a message about
     not being able to clone something.

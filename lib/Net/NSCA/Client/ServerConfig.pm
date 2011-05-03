@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 ###############################################################################
 # MOOSE
@@ -16,8 +16,9 @@ use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
 # MODULES
+use Const::Fast qw(const);
 use Convert::Binary::C 0.74 ();
-use Readonly 1.03;
+use List::MoreUtils ();
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -25,14 +26,14 @@ use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
 # OVERLOADED FUNCTIONS
-__PACKAGE__->meta->add_package_symbol(q{&()}    => sub { });
-__PACKAGE__->meta->add_package_symbol(q{&("=="} => sub {  $_[0]->is_compatible_with });
-__PACKAGE__->meta->add_package_symbol(q{&("!="} => sub { !$_[0]->is_compatible_with });
+__PACKAGE__->meta->add_package_symbol(q{&()}  => sub { });
+__PACKAGE__->meta->add_package_symbol(q{&(==} => sub {  $_[0]->is_compatible_with($_[1]) });
+__PACKAGE__->meta->add_package_symbol(q{&(!=} => sub { !$_[0]->is_compatible_with($_[1]) });
 
 ###############################################################################
 # PRIVATE CONSTANTS
-Readonly my $BYTES_FOR_16BITS => 2;
-Readonly my $BYTES_FOR_32BITS => 4;
+const my $BYTES_FOR_16BITS => 2;
+const my $BYTES_FOR_32BITS => 4;
 
 ###############################################################################
 # ATTRIBUTES
@@ -77,13 +78,16 @@ has _c_packer => (
 sub is_compatible_with {
 	my ($self, $server_config) = @_;
 
+	# Attribute list to compare
+	my @attribute = (qw[
+		initialization_vector_length
+		max_description_length
+		max_hostname_length
+		max_service_message_length
+	]);
+
 	# Compatible if all attributes are equal
-	return $server_config->isa(ref $self)
-	    && $self->initialization_vector_length == $server_config->initialization_vector_length
-	    && $self->max_description_length       == $server_config->max_description_length
-	    && $self->max_hostname_length          == $server_config->max_hostname_length
-	    && $self->max_service_message_length   == $server_config->max_service_message_length
-	;
+	return List::MoreUtils::all { $self->$_ == $server_config->$_ } @attribute;
 }
 sub pack_data_packet {
 	my ($self, $args) = @_;
@@ -154,12 +158,14 @@ sub _install_initial_packet_struct {
 	my $INITIALIZATION_VECTOR_LENGTH = $self->initialization_vector_length;
 
 	# Add the init_packet_struct structure
-	$c->parse(<<"ENDC");
+	## no critic (ValuesAndExpressions::RequireUpperCaseHeredocTerminator)
+	## no critic (CodeLayout::ProhibitHardTabs) otherwise editor doesn't know when here-doc terminates
+	$c->parse(<<"	ENDC");
 		struct init_packet_struct {
 			char      iv[$INITIALIZATION_VECTOR_LENGTH];
 			u_int32_t timestamp;
 		};
-ENDC
+	ENDC
 
 	# Tag the IV as a binary string
 	$c->tag('init_packet_struct.iv', Format => 'Binary');
@@ -176,7 +182,9 @@ sub _install_data_packet_struct {
 	my $MAX_SERVICE_MESSAGE_LENGTH     = $self->max_service_message_length;
 
 	# Add the data_packet_struct structure
-	$c->parse(<<"ENDC");
+	## no critic (ValuesAndExpressions::RequireUpperCaseHeredocTerminator)
+	## no critic (CodeLayout::ProhibitHardTabs) otherwise editor doesn't know when here-doc terminates
+	$c->parse(<<"	ENDC");
 		struct data_packet_struct {
 			int16_t   packet_version;
 			u_int32_t crc32_value;
@@ -186,7 +194,7 @@ sub _install_data_packet_struct {
 			char      svc_description[$MAX_SERVICE_DESCRIPTION_LENGTH];
 			char      plugin_output[$MAX_SERVICE_MESSAGE_LENGTH];
 		};
-ENDC
+	ENDC
 
 	# Add the string hooks to all the string members
 	foreach my $string_member (qw(host_name svc_description plugin_output)) {
@@ -326,7 +334,7 @@ NSCA server
 
 =head1 VERSION
 
-This documentation refers to version 0.008
+This documentation refers to version 0.009
 
 =head1 SYNOPSIS
 
@@ -472,13 +480,15 @@ values. The raw packet may be given as a string or as a scalar reference.
 
 =over
 
+=item * L<Const::Fast|Const::Fast>
+
 =item * L<Convert::Binary::C|Convert::Binary::C> 0.74
+
+=item * L<List::MoreUtils|List::MoreUtils>
 
 =item * L<Moose|Moose> 0.89
 
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
-
-=item * L<Readonly|Readonly> 1.03
 
 =item * L<namespace::clean|namespace::clean> 0.04
 

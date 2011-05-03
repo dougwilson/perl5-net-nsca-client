@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 ###############################################################################
 # MOOSE
@@ -20,11 +20,11 @@ use Net::NSCA::Client::Library qw(Hostname PortNumber Timeout);
 
 ###############################################################################
 # MODULES
+use Const::Fast qw(const);
 use English qw(-no_match_vars);
 use IO::Socket::INET;
 use Net::NSCA::Client::InitialPacket;
 use Net::NSCA::Client::ServerConfig ();
-use Readonly 1.03;
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -32,8 +32,8 @@ use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
 # CONSTANTS
-Readonly our $DEFAULT_TIMEOUT  => 10;
-Readonly our $SOCKET_READ_SIZE => 512;
+const our $DEFAULT_TIMEOUT  => 10;
+const our $SOCKET_READ_SIZE => 512;
 
 ###############################################################################
 # ATTRIBUTES
@@ -148,8 +148,13 @@ sub _build_initial_packet {
 
 	# Read the bytes
 	## no critic (Subroutines::ProtectPrivateSubs)
-	$self->socket->sysread($received_bytes,
+	my $recv = $self->socket->sysread($received_bytes,
 		$self->server_config->_c_packer->sizeof('init_packet_struct'));
+
+	if ($recv == 0) {
+		# Reached EOF
+		Moose->throw_error('Remote host terminated connection');
+	}
 
 	# Create the initial packet object
 	my $initial_packet = Net::NSCA::Client::InitialPacket->new(
@@ -197,7 +202,7 @@ the server.
 
 =head1 VERSION
 
-This documentation refers to version 0.008
+This documentation refers to version 0.009
 
 =head1 SYNOPSIS
 
@@ -205,8 +210,8 @@ This documentation refers to version 0.008
 
   # Create a new connection
   my $connection = Net::NSCA::Client::Connection->new(
-    remote_host => 'nagios.example.net',
-    remote_port => $nsca_port,
+      remote_host => 'nagios.example.net',
+      remote_port => $nsca_port,
   );
 
   # Send a packet
@@ -314,7 +319,8 @@ correct timestamp is set before sending the packet.
 
 =head1 CONSTANTS
 
-Constants provided by this library are protected by the L<Readonly|Readonly> module.
+Constants provided by this library are protected by the
+L<Const::Fast|Const::Fast> module.
 
 =head2 C<$DEFAULT_TIMEOUT>
 
@@ -328,6 +334,8 @@ This is the number of bytes that will be read from the socket at a time.
 
 =over
 
+=item * L<Const::Fast|Const::Fast>
+
 =item * L<English|English>
 
 =item * L<IO::Socket::INET|IO::Socket::INET>
@@ -339,8 +347,6 @@ This is the number of bytes that will be read from the socket at a time.
 =item * L<Moose|Moose> 0.89
 
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
-
-=item * L<Readonly|Readonly> 1.03
 
 =item * L<namespace::clean|namespace::clean> 0.04
 

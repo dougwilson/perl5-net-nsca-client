@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 ###############################################################################
 # MOOSE
@@ -19,30 +19,23 @@ use MooseX::StrictConstructor 0.08;
 with 'MooseX::Clone';
 
 ###############################################################################
+# MOOSE TYPES
+use Net::NSCA::Client::Library 0.009 qw(Bytes);
+
+###############################################################################
 # MODULES
 use Digest::CRC ();
 use Net::NSCA::Client::ServerConfig ();
-use Readonly 1.03;
+use Net::NSCA::Client::Utils qw(initialize_moose_attr_early);
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
 use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
-# CONSTANTS
-Readonly our $MAX_HOSTNAME_LENGTH            => 64;
-Readonly our $MAX_SERVICE_DESCRIPTION_LENGTH => 128;
-Readonly our $MAX_SERVICE_MESSAGE_LENGTH     => 512;
-
-###############################################################################
 # OVERLOADED FUNCTIONS
 __PACKAGE__->meta->add_package_symbol(q{&()}  => sub {                   });
 __PACKAGE__->meta->add_package_symbol(q{&(""} => sub { shift->raw_packet });
-
-###############################################################################
-# PRIVATE CONSTANTS
-Readonly my $BYTES_FOR_16BITS => 2;
-Readonly my $BYTES_FOR_32BITS => 4;
 
 ###############################################################################
 # ATTRIBUTES
@@ -61,10 +54,11 @@ has packet_version => (
 );
 has raw_packet => (
 	is  => 'ro',
-	isa => 'Str',
+	isa => Bytes,
 
 	lazy    => 1,
 	builder => '_build_raw_packet',
+	coerce  => 1,
 );
 has server_config => (
 	is  => 'ro',
@@ -112,12 +106,17 @@ around BUILDARGS => sub {
 	# Call the original method to get args HASHREF
 	my $args = $class->$original_method(@args);
 
-	if (exists $args->{raw_packet}) {
+	if (defined(my $raw_packet = initialize_moose_attr_early($class, raw_packet => $args))) {
 		# The packet was provided to the constructor
-		$args = {
-			%{$args}, # Given arguments
-			_constructor_options_from_string($args->{raw_packet}, $args->{server_config})
-		};
+
+		# Get the server_config as well
+		my $server_config = initialize_moose_attr_early($class, server_config => $args);
+
+		# Build constructor arguments from the raw packet
+		my $new_args = _constructor_options_from_string($raw_packet, $server_config);
+
+		# Merge the arguments together
+		$args = { %{$args}, %{$new_args} };
 	}
 
 	return $args;
@@ -182,14 +181,14 @@ sub _constructor_options_from_string {
 	my $unpacket = $server_config->unpack_data_packet($packet);
 
 	# Return the options for the constructor
-	return (
+	return {
 		hostname            => $unpacket->{host_name      },
 		packet_version      => $unpacket->{packet_version },
 		service_description => $unpacket->{svc_description},
 		service_message     => $unpacket->{plugin_output  },
 		service_status      => $unpacket->{return_code    },
 		unix_timestamp      => $unpacket->{timestamp      },
-	);
+	};
 }
 sub _is_packet_valid {
 	my ($packet, $server_config) = @_;
@@ -221,7 +220,7 @@ Net::NSCA::Client::DataPacket - Implements data packet for the NSCA protocol
 
 =head1 VERSION
 
-This documentation refers to version 0.008
+This documentation refers to version 0.009
 
 =head1 SYNOPSIS
 
@@ -354,8 +353,6 @@ representation is what will be sent over the network.
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
 
 =item * L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig>
-
-=item * L<Readonly|Readonly> 1.03
 
 =item * L<namespace::clean|namespace::clean> 0.04
 

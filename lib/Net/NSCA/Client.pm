@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 ###############################################################################
 # MOOSE
@@ -16,15 +16,15 @@ use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
 # MOOSE TYPES
-use Net::NSCA::Client::Library qw(Hostname PortNumber Timeout);
+use Net::NSCA::Client::Library 0.009 qw(Bytes Hostname PortNumber Timeout);
 
 ###############################################################################
 # MODULES
+use Const::Fast qw(const);
 use Net::NSCA::Client::Connection;
 use Net::NSCA::Client::Connection::TLS;
 use Net::NSCA::Client::DataPacket;
 use Net::NSCA::Client::ServerConfig ();
-use Readonly 1.03;
 
 ###############################################################################
 # ALL IMPORTS BEFORE THIS WILL BE ERASED
@@ -32,21 +32,22 @@ use namespace::clean 0.04 -except => [qw(meta)];
 
 ###############################################################################
 # CONSTANTS
-Readonly our $DEFAULT_HOST    => '127.0.0.1';
-Readonly our $DEFAULT_PORT    => 5667;
-Readonly our $DEFAULT_TIMEOUT => 10;
-Readonly our $STATUS_OK       => 0;
-Readonly our $STATUS_WARNING  => 1;
-Readonly our $STATUS_CRITICAL => 2;
-Readonly our $STATUS_UNKNOWN  => 3;
+const our $DEFAULT_HOST    => '127.0.0.1';
+const our $DEFAULT_PORT    => 5667;
+const our $DEFAULT_TIMEOUT => 10;
+const our $STATUS_OK       => 0;
+const our $STATUS_WARNING  => 1;
+const our $STATUS_CRITICAL => 2;
+const our $STATUS_UNKNOWN  => 3;
 
 ###############################################################################
 # ATTRIBUTES
 has encryption_password => (
 	is  => 'rw',
-	isa => 'Str',
+	isa => Bytes,
 
 	clearer   => 'clear_encryption_password',
+	coerce    => 1,
 	predicate => 'has_encryption_password',
 );
 has encryption_type => (
@@ -89,21 +90,30 @@ sub send_report {
 	my ($hostname, $service, $message, $status) = @args{qw(
 	     hostname   service   message   status)};
 
+	# Copy some attributes for this for the connection
+	my @connection_args = map { $_ => $self->$_ }
+		(qw[remote_host remote_port server_config timeout]);
+
+	if ($self->encryption_type ne 'none') {
+		# Start the TLS object arguments
+		my @tls_args = (
+			encryption_type => $self->encryption_type,
+		);
+
+		if ($self->has_encryption_password) {
+			# Add the password
+			push @tls_args, password => $self->encryption_password;
+		}
+
+		# Create a TLS object for the connection
+		my $tls = Net::NSCA::Client::Connection::TLS->new(@tls_args);
+
+		# Add the TLS object to the connection
+		push @connection_args, transport_layer_security => $tls;
+	}
+
 	# Create a new connection to the remote server
-	my $connection = Net::NSCA::Client::Connection->new(
-		remote_host   => $self->remote_host,
-		remote_port   => $self->remote_port,
-		server_config => $self->server_config,
-		timeout       => $self->timeout,
-
-		($self->encryption_type eq 'none' ? () : (
-			transport_layer_security => Net::NSCA::Client::Connection::TLS->new(
-				encryption_type => $self->encryption_type,
-
-				($self->has_encryption_password ? (password => $self->encryption_password) : ()),
-			)
-		)),
-	);
+	my $connection = Net::NSCA::Client::Connection->new(@connection_args);
 
 	# Create a data packet to send back
 	my $data_packet = Net::NSCA::Client::DataPacket->new(
@@ -135,7 +145,7 @@ Net::NSCA::Client - Send passive checks to Nagios locally and remotely.
 
 =head1 VERSION
 
-This documentation refers to version 0.008
+This documentation refers to version 0.009
 
 =head1 SYNOPSIS
 
@@ -251,11 +261,28 @@ C<$STATUS_*> constants.
 
 =head1 SPECIFICATION
 
+The NSCA protocol is currently at L<version 3|/NSCA PROTOCOL 3>. Simply
+put, the NSCA protocol is very simple from the perspective for the C
+language. The NSCA program has a C structure that is populated and then
+sent across the network in raw form.
+
+=head2 NSCA PROTOCOL 1
+
+Currently I cannot find any information on this (it is probably ancient; at
+least before 2002). This module does not support this protocol version.
+
+=head2 NSCA PROTOCOL 2
+
+This protocol is identical to L</NSCA PROTOCOL 3> except that the
+C<packet_version> is the integer C<2> to match the protocol version. The
+difference between the two protocols is that with version 3, passive host
+checks were introduced and thus the version had to change otherwise the
+server would think that the check was for a service with no name.
+
 =head2 NSCA PROTOCOL 3
 
-The NSCA protocol is currently at version 3. Simply put, the NSCA protocol is
-very simple from the perspective for the C language. The NSCA program has a
-C structure that is populated and then sent across the network in raw form.
+This protocol version was first introduced in NSCA version 2.2.
+
 Below is the definition of the C structure taken from C<common.h> in NSCA
 version 2.7.2.
 
@@ -304,8 +331,9 @@ followed by the IV are followed for the password (byte-per-byte, looping).
 
 =head4 All other Encryptions
 
-All other specified encryption methods are performed in cipher feedback (CFB)
-mode, at one byte.
+All other specified encryption methods are performed in cipher feedback
+(CFB) mode, in one bye blocks (even if the encryption method doesn't
+actually support being used in one byte block modes.
 
 =head1 CONSTANTS
 
@@ -341,6 +369,8 @@ This is the status value when a service is UNKNOWN
 
 =over
 
+=item * L<Const::Fast|Const::Fast>
+
 =item * L<Moose|Moose> 0.89
 
 =item * L<MooseX::StrictConstructor|MooseX::StrictConstructor> 0.08
@@ -350,8 +380,6 @@ This is the status value when a service is UNKNOWN
 =item * L<Net::NSCA::Client::DataPacket|Net::NSCA::Client::DataPacket>
 
 =item * L<Net::NSCA::Client::ServerConfig|Net::NSCA::Client::ServerConfig>
-
-=item * L<Readonly|Readonly> 1.03
 
 =item * L<namespace::clean|namespace::clean> 0.04
 
