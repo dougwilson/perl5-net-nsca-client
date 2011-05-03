@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use 5.008;
 use strict;
@@ -33,7 +33,7 @@ diag('Loopback address: ' . loopback_addr());
 			message  => 'OK - Test message',
 			status   => $Net::NSCA::Client::STATUS_OK,
 		);
-	}, qr/Connection refused/, "Unable to connect to nothing (port $port)");
+	}, qr/Connection refused|connection attempt failed/, "Unable to connect to nothing (port $port)");
 }
 
 # Create the client and server to perform the tests
