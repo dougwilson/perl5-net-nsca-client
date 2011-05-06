@@ -1,6 +1,12 @@
 Revision history for Net-NSCA-Client
 ====================================
 
+0.009001 2011-05-05
+  * FIX: The test `t/live_server.t` had a test at the beginning to
+    test for the exception of connecting to nothing. Since these error
+    messages are not the same always, the test is changed to just
+    test for any exception.
+
 0.009 2011-05-02
   * FIX: An attribute was missing the lazy attribute and Moose 2.00
     caused this to make the tests failed. Added the lazy attribute.
