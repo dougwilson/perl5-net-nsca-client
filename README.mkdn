@@ -29,8 +29,6 @@ You can also look for information at:
 
 *   [RT, CPAN's request tracker](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-NSCA-Client)
 
-*   [AnnoCPAN, Annotated CPAN documentation](http://annocpan.org/dist/Net-NSCA-Client)
-
 *   [CPAN Ratings](http://cpanratings.perl.org/d/Net-NSCA-Client)
 
 *   [Search CPAN](http://search.cpan.org/dist/Net-NSCA-Client)
