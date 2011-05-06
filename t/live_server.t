@@ -26,14 +26,14 @@ diag('Loopback address: ' . loopback_addr());
 	);
 
 	# Send a report to some random thing
-	like(exception {
+	isnt(exception {
 		$client->send_report(
 			hostname => 'test',
 			service  => 'Test',
 			message  => 'OK - Test message',
 			status   => $Net::NSCA::Client::STATUS_OK,
 		);
-	}, qr/Connection refused|connection attempt failed/, "Unable to connect to nothing (port $port)");
+	}, undef, "Unable to connect to nothing (port $port)");
 }
 
 # Create the client and server to perform the tests

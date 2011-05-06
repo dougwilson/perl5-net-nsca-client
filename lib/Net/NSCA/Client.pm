@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.009';
+our $VERSION   = '0.009001';
 
 ###############################################################################
 # MOOSE
@@ -145,7 +145,7 @@ Net::NSCA::Client - Send passive checks to Nagios locally and remotely.
 
 =head1 VERSION
 
-This documentation refers to version 0.009
+This documentation refers to version 0.009001
 
 =head1 SYNOPSIS
 
@@ -426,10 +426,6 @@ You can also look for information at:
 =item * RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-NSCA-Client>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Net-NSCA-Client>
 
 =item * CPAN Ratings
 
