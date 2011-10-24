@@ -55,6 +55,9 @@ my $build = Module::Build->new(
 		'namespace::clean'          => '0.04',
 	},
 
+	# The above requirements are static
+	dynamic_config => 0,
+
 	# Enable tests to be in multi-level directories
 	recursive_test_files => 1,
 
