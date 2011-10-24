@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 use 5.008;
 use strict;
@@ -7,7 +7,7 @@ use warnings 'all';
 ###########################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.009001';
+our $VERSION   = '0.009002';
 
 ###########################################################################
 # MODULES
@@ -186,7 +186,7 @@ send_nsca - Send reports to NSCA just like send_nsca in NSCA 2.7.2
 
 =head1 VERSION
 
-This documentation refers to send_nsca version 0.009001
+This documentation refers to version 0.009002
 
 =head1 DESCRIPTION
 

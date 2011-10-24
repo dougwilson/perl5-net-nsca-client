@@ -7,7 +7,7 @@ use warnings 'all';
 ###############################################################################
 # METADATA
 our $AUTHORITY = 'cpan:DOUGDUDE';
-our $VERSION   = '0.009001';
+our $VERSION   = '0.009002';
 
 ###############################################################################
 # MOOSE
@@ -202,7 +202,7 @@ the server.
 
 =head1 VERSION
 
-This documentation refers to version 0.009001
+This documentation refers to version 0.009002
 
 =head1 SYNOPSIS
 
