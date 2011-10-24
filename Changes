@@ -1,5 +1,10 @@
 Revision history for Perl 5 distribution Net-NSCA-Client
 
+0.009002 2011-10-24
+ [BUG FIXES]
+ - Changed the shebang for the send_nsca script so on install, it will be
+   set to the path of the perl this distribution was installed to.
+
 0.009001 2011-05-05
  [BUG FIXES]
  - The test t/live_server.t had a test at the beginning to test for the
