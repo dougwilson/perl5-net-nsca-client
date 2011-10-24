@@ -19,7 +19,12 @@ my $build = Module::Build->new(
 		},
 	},
 
-	# Module that are required for tests in t/
+	# Modules that are required for this script
+	configure_requires => {
+		'Module::Build' => '0.31',
+	},
+
+	# Modules that are required for tests in t/
 	build_requires => {
 		'Data::Section'   => 0,
 		'MIME::Base64'    => '2.00',
@@ -31,7 +36,7 @@ my $build = Module::Build->new(
 		'Test::TCP'       => '1.03',
 	},
 
-	# Module that are required
+	# Modules that are required
 	requires => {
 		'perl'                      => '5.008001',
 		'Const::Fast'               => 0,

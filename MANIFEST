@@ -12,6 +12,7 @@ lib/Net/NSCA/Client/Troubleshooting.pod
 lib/Net/NSCA/Client/Utils.pm
 LICENSE
 MANIFEST			This list of files
+META.json
 META.yml
 README
 t/00-load.t
