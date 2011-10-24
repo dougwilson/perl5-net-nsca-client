@@ -16,5 +16,7 @@ plan skip_all => 'Set TEST_AUTHOR to enable this test'
 test_requires 'Test::CleanNamespaces';
 
 # Run tests
-all_namespaces_clean();
-
+my @modules = grep { $_ ne 'Net::NSCA::Client::Utils' }
+	Test::CleanNamespaces->find_modules;
+plan tests => scalar @modules;
+namespaces_clean(@modules);
