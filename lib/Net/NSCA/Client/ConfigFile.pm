@@ -34,7 +34,7 @@ const my %CONFIG_VARIABLE_ATTRIBUTE => (
 	encryption_method => 'encryption_method',
 	password          => 'encryption_password',
 );
-const my %CONFIG_VARIABLE_VALUE => (
+my %CONFIG_VARIABLE_VALUE = (
 	encryption_method => \&_encryption_method_from_number,
 	password          => \&_untaint_password,
 );
