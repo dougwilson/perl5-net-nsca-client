@@ -27,6 +27,7 @@ my $build = Module::Build->new(
 	# Modules that are required for tests in t/
 	build_requires => {
 		'Data::Section'   => 0,
+		'IO::String'      => 0,
 		'MIME::Base64'    => '2.00',
 		'Test::Class'     => '0.33',
 		'Test::Command'   => '0.08',
@@ -51,6 +52,7 @@ my $build = Module::Build->new(
 		'MooseX::Clone'             => 0,
 		'MooseX::StrictConstructor' => '0.08',
 		'MooseX::Types'             => '0.08',
+		'MooseX::Types::IO'         => 0,
 		'MooseX::Types::PortNumber' => 0,
 		'namespace::clean'          => '0.04',
 	},

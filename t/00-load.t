@@ -21,6 +21,7 @@ eval {
 BEGIN {
 	my @modules = qw(
 		Net::NSCA::Client
+		Net::NSCA::Client::ConfigFile
 		Net::NSCA::Client::Connection
 		Net::NSCA::Client::Connection::TLS
 		Net::NSCA::Client::DataPacket

@@ -16,7 +16,7 @@ use MooseX::StrictConstructor 0.08;
 
 ###############################################################################
 # MOOSE TYPES
-use Net::NSCA::Client::Library 0.009 qw(Bytes Hostname PortNumber Timeout);
+use Net::NSCA::Client::Library 0.009 qw(Bytes ConfigFile Hostname PortNumber Timeout);
 
 ###############################################################################
 # MODULES
@@ -42,6 +42,14 @@ const our $STATUS_UNKNOWN  => 3;
 
 ###############################################################################
 # ATTRIBUTES
+has config => (
+	is  => 'ro',
+	isa => ConfigFile,
+
+	clearer   => '_clear_config',
+	coerce    => 1,
+	predicate => 'has_config',
+);
 has encryption_password => (
 	is  => 'rw',
 	isa => Bytes,
@@ -80,6 +88,23 @@ has timeout => (
 
 	default => $DEFAULT_TIMEOUT,
 );
+
+###############################################################################
+# CONSTRUCTOR
+around BUILDARGS => sub {
+	my ($original_method, $class, @args) = @_;
+
+	# Call the original method to get args HASHREF
+	my $args = $class->$original_method(@args);
+
+	if (defined(my $config = _initialize_attr_early($class, config => $args))) {
+		# A configuration object was provided, so overwrite some values
+		# with information from the config object.
+		$args = {%{$args}, %{$config->client_new_args}};
+	}
+
+	return $args;
+};
 
 ###############################################################################
 # METHODS
@@ -129,6 +154,32 @@ sub send_report {
 
 	# Nothing good to return, so return self
 	return $self;
+}
+
+###############################################################################
+# PRIVATE FUNCTIONS
+sub _initialize_attr_early {
+	my ($class, $attr_name, $args) = @_;
+
+	# Find the attribute with the given name
+	my $attr = $class->meta->find_attribute_by_name($attr_name);
+
+	if (!$attr->has_init_arg || !exists $args->{$attr->init_arg}) {
+		# There would be only defaults, which this function doesn't consider
+		return;
+	}
+
+	# Get the value from the args
+	my $raw_value = $args->{$attr->init_arg};
+
+	# Get the coerced value
+	my $value = $attr->should_coerce && $attr->type_constraint->has_coercion
+		? $attr->type_constraint->coerce($raw_value) : $raw_value;
+
+	# Make sure it is a valid value
+	$attr->verify_against_type_constraint($value, instance => $class->meta);
+
+	return $value;
 }
 
 ###############################################################################
@@ -197,6 +248,13 @@ L</ATTRIBUTES> section).
   # Get an attribute
   my $value = $object->attribute_name;
 
+=head2 config
+
+This is a L<Net::NSCA::Client::ConfigFile|Net::NSCA::Client::ConfigFile>
+object that contains configuration information for the client. Typically
+this is the encryption password and type. See L</has_config> for
+determining if a configuration object is present.
+
 =head2 encryption_password
 
 This is the password to use with the encryption.
@@ -233,7 +291,12 @@ L</$DEFAULT_TIMEOUT>.
 
 This will remove the encryption password that is currently set.
 
-=head2 hsa_encryption_password
+=head2 has_config
+
+This will return a Boolean if there is a configuration object in the
+L</config> attribute.
+
+=head2 has_encryption_password
 
 This will return a Boolean if there is any encryption password.
 
